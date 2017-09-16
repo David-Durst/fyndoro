@@ -180,7 +180,7 @@ model_ft.fc = nn.Linear(num_ftrs, 2)
 if use_gpu:
     model_ft = model_ft.cuda()
 
-criterion = uncertainCrossEntropyLoss()
+criterion = uncertainCrossEntropyLoss(use_gpu)
 
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)

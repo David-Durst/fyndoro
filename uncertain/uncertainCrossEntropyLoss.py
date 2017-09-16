@@ -1,5 +1,6 @@
 import torch.nn as nn
-from torch.nn.modules.loss import _WeightedLoss
+from torch.nn.modules.loss import _WeightedLoss, CrossEntropyLoss
+import torch.autograd as autograd
 import torch.nn.functional as F
 from torch.nn.modules.loss import _assert_no_grad
 import torch
@@ -21,7 +22,7 @@ class UncertainCrossEntropyLoss(_WeightedLoss):
     such that the weights for each row sum to 1. Each index in each row
     should correspond to each classes index.
 
-    `target` for each value of a 2D tensor of size `batch x n`
+    `target` has to be a 2D 'Tensor' of floats of size `batch x n`
 
     The loss can be described as::
 
@@ -57,9 +58,10 @@ class UncertainCrossEntropyLoss(_WeightedLoss):
         >>> output.backward()
     """
 
-    def __init__(self, weight=None, size_average=True, ignore_index=-100):
-        super(CrossEntropyLoss, self).__init__(weight, size_average)
+    def __init__(self, use_gpu, weight=None, size_average=True, ignore_index=-100):
+        super(UncertainCrossEntropyLoss, self).__init__(weight, size_average)
         self.ignore_index = ignore_index
+        self.use_gpu = use_gpu
 
     def forward(self, input, trueDistributions):
         _assert_no_grad(trueDistributions)
@@ -67,10 +69,12 @@ class UncertainCrossEntropyLoss(_WeightedLoss):
         # elmentwise multiply every logsoft_max by the true distribution for its example to get
         # the cross-entropy
         unsumedCrossEntropy = logSoftmaxesForAll * trueDistributions
-        # sum all, make negative, and take average per example
-        return torch.sum(unsumedCrossEntropy)
+        return torch.sum(unsumedCrossEntropy) * -1 / input.size(0)
+        # sum all, and let nll_loss make negative
         # cross entropy function just calls nll_loss(log_softmax(input), target, weight, size_average, ignore_index)
         # nll_loss just calls for matrices of size 2
         # _functions.thnn.NLLLoss.apply(input, target, weight, size_average, ignore_index)
         # use 0 for size as want to get a 0 for every row
-        return F.nll_loss(torch.sum(unsumedCrossEntropy), torch.LongTensor([0] * input.size(0)))
+        nonCudaTarget = autograd.Variable(torch.LongTensor([0] * input.size(0)))
+        withRightCudaTarget = nonCudaTarget.cuda() if self.use_gpu else nonCudaTarget
+        return F.nll_loss(torch.sum(unsumedCrossEntropy, dim = 1), withRightCudaTarget)
