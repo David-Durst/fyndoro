@@ -8,7 +8,6 @@ from uncertain import uncertainCrossEntropyLoss
 class TestUncertainCrossEntropyLoss(unittest.TestCase):
 
     def forwardTestNExamples(self, numExamples, testName):
-        print("The initial seed for " + testName + " is: " + str(torch.initial_seed()))
         input = autograd.Variable(torch.randn(numExamples, 2), requires_grad=True)
         all0target = autograd.Variable(torch.LongTensor([0] * numExamples))
         all1target = autograd.Variable(torch.LongTensor([1] * numExamples))
@@ -25,10 +24,10 @@ class TestUncertainCrossEntropyLoss(unittest.TestCase):
         self.assertAlmostEqual((certainAll0 + certainAll1) / 2, uncertainLoss(input, halfhalfprobabilites).data[0], places=3)
 
     def test_forwardCorrectLossOneEx(self):
-        self.forwardTestNExamples(1, "test_forwardCorrectLossOne")
+        self.forwardTestNExamples(1, "test_forwardCorrectLossOneEx")
 
     def test_forwardCorrectLossMultiEx(self):
-        self.forwardTestNExamples(7, "test_forwardCorrectLossOne")
+        self.forwardTestNExamples(7, "test_forwardCorrectLossMultiEx")
 
 if __name__ == '__main__':
     unittest.main()
