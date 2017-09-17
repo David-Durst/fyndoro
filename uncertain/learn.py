@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import time
 import copy
 import os
-from . import uncertainCrossEntropyLoss
+from uncertain.uncertainCrossEntropyLoss import UncertainCrossEntropyLoss
 
 plt.ion()   # interactive mode
 
@@ -37,12 +37,17 @@ data_transforms = {
 
 data_dir = 'hymenoptera_data'
 
-def classIndexToProbability(self, classIdx):
-    idx_to_class = {v: k for k, v in self.class_to_idx.items()}
-    return [float(x) for x in idx_to_class[classIdx].split(",")]
-
-dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x], target_transform=classIndexToProbability)
+dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
          for x in ['train', 'val']}
+
+def classIndexToProbabilityGenerator(dataset):
+
+    return classIndexToProbability
+
+# need to do this here as classIndexToProbability must have access to dsets's fields, and dset is not passed in to it
+#dsets['train'].target_transform = classIndexToProbabilityGenerator(dsets['train'])
+#dsets['val'].target_transform = classIndexToProbabilityGenerator(dsets['train'])
+
 dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
                                                shuffle=True, num_workers=4)
                 for x in ['train', 'val']}
@@ -71,6 +76,11 @@ out = torchvision.utils.make_grid(inputs)
 
 imshow(out, title=[dset_classes[x] for x in classes])
 
+
+def classIndexToProbability(classIdx, class_to_idx_map):
+    idx_to_class = {v: k for k, v in class_to_idx_map.items()}
+    return [float(x) for x in idx_to_class[classIdx].split(",")]
+
 def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
     since = time.time()
 
@@ -95,14 +105,16 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
             # Iterate over data.
             for data in dset_loaders[phase]:
                 # get the inputs
-                inputs, labels = data
+                inputs, labelIndices = data
+
+                labelProbabilities = torch.FloatTensor([classIndexToProbability(index, dsets[phase].class_to_idx) for index in labelIndices])
 
                 # wrap them in Variable
                 if use_gpu:
-                    inputs, labels = Variable(inputs.cuda()), \
-                        Variable(labels.cuda())
+                    inputs, labelProbabilitiesVar = Variable(inputs.cuda()), \
+                        Variable(labelProbabilities.cuda())
                 else:
-                    inputs, labels = Variable(inputs), Variable(labels)
+                    inputs, labelProbabilitiesVar = Variable(inputs), Variable(labelProbabilities)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
@@ -110,16 +122,18 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
                 # forward
                 outputs = model(inputs)
                 _, preds = torch.max(outputs.data, 1)
-                loss = criterion(outputs, labels)
+                loss = criterion(outputs, labelProbabilitiesVar)
 
                 # backward + optimize only if in training phase
                 if phase == 'train':
                     loss.backward()
                     optimizer.step()
 
+                # the correct label is the one with greatest probability
+                _, labels = torch.max(labelProbabilities, dim=1)
                 # statistics
                 running_loss += loss.data[0]
-                running_corrects += torch.sum(preds == labels.data)
+                running_corrects += torch.sum(preds == labels)
 
             epoch_loss = running_loss / dset_sizes[phase]
             epoch_acc = running_corrects / dset_sizes[phase]
@@ -185,7 +199,7 @@ model_ft.fc = nn.Linear(num_ftrs, 2)
 if use_gpu:
     model_ft = model_ft.cuda()
 
-criterion = uncertainCrossEntropyLoss()
+criterion = UncertainCrossEntropyLoss()
 
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
