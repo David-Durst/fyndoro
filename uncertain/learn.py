@@ -35,7 +35,7 @@ data_transforms = {
     ]),
 }
 
-data_dir = 'hymenoptera_data'
+data_dir = 'uncertain/hymenoptera_data'
 
 dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
          for x in ['train', 'val']}
@@ -130,10 +130,10 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
                     optimizer.step()
 
                 # the correct label is the one with greatest probability
-                _, labels = torch.max(labelProbabilities, dim=1)
+                _, labels = torch.max(labelProbabilitiesVar, dim=1)
                 # statistics
                 running_loss += loss.data[0]
-                running_corrects += torch.sum(preds == labels)
+                running_corrects += torch.sum(preds == labels.data)
 
             epoch_loss = running_loss / dset_sizes[phase]
             epoch_acc = running_corrects / dset_sizes[phase]
