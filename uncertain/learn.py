@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import time
 import copy
 import os
-from uncertain import uncertainCrossEntropyLoss
+from . import uncertainCrossEntropyLoss
 
 plt.ion()   # interactive mode
 
@@ -36,7 +36,12 @@ data_transforms = {
 }
 
 data_dir = 'hymenoptera_data'
-dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
+
+def classIndexToProbability(self, classIdx):
+    idx_to_class = {v: k for k, v in self.class_to_idx.items()}
+    return [float(x) for x in idx_to_class[classIdx].split(",")]
+
+dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x], target_transform=classIndexToProbability)
          for x in ['train', 'val']}
 dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
                                                shuffle=True, num_workers=4)
