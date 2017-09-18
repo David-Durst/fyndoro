@@ -1,7 +1,7 @@
 import io
 import os
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, splitext
 import urllib.request
 
 
@@ -13,15 +13,16 @@ from google.cloud.vision import types
 client = vision.ImageAnnotatorClient()
 
 # The name of the image file to annotate
-dirsToDownload = ['images/1.0,0.0', 'images/0.85,0.15', 'images0.7,0.3']
+dirsToDownload = ['images/1.0,0.0', 'images/0.85,0.15', 'images/0.7,0.3']
 
 for dir in dirsToDownload:
     if not os.path.exists(dir):
         os.makedirs(dir)
 
 numFilesDownloaded = 0
-# go through all directories
+# go through all directories and download next layer of images
 for i in range(len(dirsToDownload) - 1):
+    break
     # from https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
     imageFiles = [f for f in listdir(dirsToDownload[i]) if isfile(join(dirsToDownload[i], f))]
 
@@ -37,5 +38,20 @@ for i in range(len(dirsToDownload) - 1):
         notes = response.web_detection
 
         for imgToDownload in notes.partial_matching_images:
-            urllib.request.urlretrieve(imgToDownload.url, join(dirsToDownload[i+1], str(numFilesDownloaded)))
+            os.system("wget --directory-prefix " + dirsToDownload[i+1] + " " + imgToDownload.url)
 
+# go through all directories, remove not jpg or png and resize the jpg and png
+for dir in dirsToDownload:
+    anyFiles = [f for f in listdir(dir) if isfile(join(dir, f))]
+
+    for f in anyFiles:
+        _, fExt = splitext(f)
+
+        relPathAndName = join(dir, f)
+
+        # delete non images (and duplicates, which have a .1 or .n at end, where n is an integer)
+        if fExt != ".png" and fExt != ".jpg":
+            os.remove(relPathAndName)
+        # otherwise, reshape them
+        else:
+            os.system("convert -resize 500x500 " + relPathAndName + " " + relPathAndName)
