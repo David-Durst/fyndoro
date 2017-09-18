@@ -22,7 +22,6 @@ for dir in dirsToDownload:
 numFilesDownloaded = 0
 # go through all directories and download next layer of images
 for i in range(len(dirsToDownload) - 1):
-    break
     # from https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
     imageFiles = [f for f in listdir(dirsToDownload[i]) if isfile(join(dirsToDownload[i], f))]
 
@@ -54,4 +53,4 @@ for dir in dirsToDownload:
             os.remove(relPathAndName)
         # otherwise, reshape them
         else:
-            os.system("convert -resize 500x500 " + relPathAndName + " " + relPathAndName)
+            os.system("convert -resize 500x500 \'" + relPathAndName + "\' \'" + relPathAndName + "\'")
