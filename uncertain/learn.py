@@ -37,7 +37,7 @@ data_transforms = {
 
 data_dir = 'uncertain/images'
 
-dsets = {x: datasets.ImageFolder(data_dir, x, data_transforms[x])
+dsets = {x: datasets.ImageFolder(data_dir, data_transforms[x])
          for x in ['train']}
 
 dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
