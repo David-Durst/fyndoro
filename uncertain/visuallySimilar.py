@@ -1,13 +1,9 @@
-import io
 import os
 from os import listdir
 from os.path import isfile, join, splitext
-import urllib.request
-
 
 # Imports the Google Cloud client library
 from google.cloud import vision
-from google.cloud.vision import types
 
 # Instantiates a client
 client = vision.ImageAnnotatorClient()
@@ -22,6 +18,7 @@ for dir in dirsToDownload:
 numFilesDownloaded = 0
 # go through all directories and download next layer of images
 for i in range(len(dirsToDownload) - 1):
+    break
     # from https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
     imageFiles = [f for f in listdir(dirsToDownload[i]) if isfile(join(dirsToDownload[i], f))]
 
@@ -39,8 +36,21 @@ for i in range(len(dirsToDownload) - 1):
         for imgToDownload in notes.partial_matching_images:
             os.system("wget --directory-prefix " + dirsToDownload[i+1] + " " + imgToDownload.url)
 
+
+# download, extract, and get 70 random elements from fall11_urls.txt
+if not os.path.exists("100urls.txt"):
+    os.system("wget http://image-net.org/imagenet_data/urls/imagenet_fall11_urls.tgz")
+    os.system("tar -xvzf imagenet_fall11_urls.tgz")
+    os.system("gshuf fall11_urls.txt -n 100 > 100urls.txt")
+
+with open("100urls.txt") as f:
+    for line in f:
+        break
+        os.system("wget --tries=1 --directory-prefix images/0.0,1.0 " + line.split("\t")[1])
+
+dirsToFormat = dirsToDownload + ["images/0.0,1.0"]
 # go through all directories, remove not jpg or png and resize the jpg and png
-for dir in dirsToDownload:
+for dir in dirsToFormat:
     anyFiles = [f for f in listdir(dir) if isfile(join(dir, f))]
 
     for f in anyFiles:

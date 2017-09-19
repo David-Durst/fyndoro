@@ -8,4 +8,5 @@
 3. Provide gcloud access to the application - gcloud auth application-default login --no-launch-browser
     a. documentation for command - https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login
 3. Install imagemagick - brew install imagemagick for mac
+3. Install gshuf (or shuf on linux) - brew install coreutils for mac
 4. Run the learner - python -m uncertain.learn

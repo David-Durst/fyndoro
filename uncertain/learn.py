@@ -35,18 +35,10 @@ data_transforms = {
     ]),
 }
 
-data_dir = 'uncertain/hymenoptera_data'
+data_dir = 'uncertain/images'
 
-dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
-         for x in ['train', 'val']}
-
-def classIndexToProbabilityGenerator(dataset):
-
-    return classIndexToProbability
-
-# need to do this here as classIndexToProbability must have access to dsets's fields, and dset is not passed in to it
-#dsets['train'].target_transform = classIndexToProbabilityGenerator(dsets['train'])
-#dsets['val'].target_transform = classIndexToProbabilityGenerator(dsets['train'])
+dsets = {x: datasets.ImageFolder(data_dir, x, data_transforms[x])
+         for x in ['train']}
 
 dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
                                                shuffle=True, num_workers=4)
@@ -92,7 +84,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
         print('-' * 10)
 
         # Each epoch has a training and validation phase
-        for phase in ['train', 'val']:
+        for phase in ['train']:
             if phase == 'train':
                 optimizer = lr_scheduler(optimizer, epoch)
                 model.train(True)  # Set model to training mode
@@ -207,4 +199,4 @@ optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
 
-visualize_model(model_ft)
+#visualize_model(model_ft)
