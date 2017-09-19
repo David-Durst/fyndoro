@@ -48,26 +48,11 @@ dset_classes = dsets['train'].classes
 
 use_gpu = torch.cuda.is_available()
 
-def imshow(inp, title=None):
-    """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
-
-
 # Get a batch of training data
 inputs, classes = next(iter(dset_loaders['train']))
 
 # Make a grid from batch
 out = torchvision.utils.make_grid(inputs)
-
-imshow(out, title=[dset_classes[x] for x in classes])
-
 
 def classIndexToProbability(classIdx, class_to_idx_map):
     idx_to_class = {v: k for k, v in class_to_idx_map.items()}
@@ -159,31 +144,6 @@ def exp_lr_scheduler(optimizer, epoch, init_lr=0.001, lr_decay_epoch=7):
 
     return optimizer
 
-
-def visualize_model(model, num_images=6):
-    images_so_far = 0
-    fig = plt.figure()
-
-    for i, data in enumerate(dset_loaders['val']):
-        inputs, labels = data
-        if use_gpu:
-            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
-        else:
-            inputs, labels = Variable(inputs), Variable(labels)
-
-        outputs = model(inputs)
-        _, preds = torch.max(outputs.data, 1)
-
-        for j in range(inputs.size()[0]):
-            images_so_far += 1
-            ax = plt.subplot(num_images//2, 2, images_so_far)
-            ax.axis('off')
-            ax.set_title('predicted: {}'.format(dset_classes[preds[j]]))
-            imshow(inputs.cpu().data[j])
-
-            if images_so_far == num_images:
-                return
-
 model_ft = models.resnet18(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 model_ft.fc = nn.Linear(num_ftrs, 2)
@@ -198,5 +158,3 @@ optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
-
-#visualize_model(model_ft)
