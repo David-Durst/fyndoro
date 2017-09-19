@@ -44,7 +44,7 @@ dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
                                                shuffle=True, num_workers=4)
                 for x in ['train']}
                 #for x in ['train', 'val']}
-dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
+dset_sizes = {x: len(dsets[x]) for x in ['train']}
 dset_classes = dsets['train'].classes
 
 use_gpu = torch.cuda.is_available()
