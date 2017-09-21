@@ -26,7 +26,7 @@ do
     # split the datasets into 25 image groups
     for i in $(seq $numIncrements)
     do
-        subsetCatImages=$catImages/$i_25
+        subsetCatImages=$catImages/subset_$i_of_$trainIncrements_training_images
         rm -rf $subsetCatImages
         mkdir -p $subsetCatImages
         mkdir -p $subsetCatImages/noGoogleTrain
@@ -34,8 +34,21 @@ do
         mkdir -p $subsetCatImages/val
 
         gshuf -n $trainIncrements -e $catImages/train/* | xargs -I {} mv {} $subsetCatImages/noGoogleTrain/
+        cp $subsetCatImages/noGoogleTrain/* $subsetCatImages/train/
         gshuf -n $valIncrements -e $catImages/val/* | xargs -I {} mv {} $subsetCatImages/val/
         python imageCleaningAndGoogleSearching/search.py $subsetCatImages/noGoogleTrain $subsetCatImages/train
+        python imageCleaningAndGoogleSearching/clean.py $subsetCatImages/train
+
+        # join this with previous subsets to create training and validation runs of increasing size
+        # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
+        mergedSubset=$catImages/merged_$(expr $trainIncrements * $i)_training_images
+        mkdir -p $mergedSubset
+        cp -r $subsetCatImages $mergedSubset
+        if [ $i -gt 1 ]
+        then
+            cp -RT $previousMergedSubset $mergedSubset
+        fi
+        previousMergedSubset=mergedSubset
     done
 done
 
