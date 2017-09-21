@@ -11,7 +11,7 @@ for f in anyFiles:
     relPathAndName = join(dir, f)
 
     # delete non images (and duplicates, which have a .1 or .n at end, where n is an integer)
-    if fExt != ".png" and fExt != ".jpg":
+    if fExt != ".png" and fExt != ".jpg" and fExt != ".JPEG":
         os.remove(relPathAndName)
     # otherwise, reshape them
     else:
