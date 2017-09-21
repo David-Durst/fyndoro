@@ -8,14 +8,23 @@ from google.cloud import vision
 # Instantiates a client
 client = vision.ImageAnnotatorClient()
 
+def makeDirs(dirsArr):
+    for dir in dirsArr:
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+
+imagesFolder = "images/"
+# the sizes of the training data (from imagenet superset, not google) and
+# the validation sets in terms of number of images
+# this will be the top level directory for the image folder (under images)
+numData = ["50"]
+
+
 # The name of the image file to annotate
 dirsToDownload = ['images/1.0,0.0', 'images/0.85,0.15', 'images/0.7,0.3']
 
-for dir in dirsToDownload:
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+makeDirs(dirsToDownload)
 
-numFilesDownloaded = 0
 # go through all directories and download next layer of images
 for i in range(len(dirsToDownload) - 1):
     break
@@ -37,13 +46,14 @@ for i in range(len(dirsToDownload) - 1):
             os.system("wget --directory-prefix " + dirsToDownload[i+1] + " " + imgToDownload.url)
 
 
-# download, extract, and get 70 random elements from fall11_urls.txt
-if not os.path.exists("100urls.txt"):
-    os.system("wget http://image-net.org/imagenet_data/urls/imagenet_fall11_urls.tgz")
-    os.system("tar -xvzf imagenet_fall11_urls.tgz")
-    os.system("gshuf fall11_urls.txt -n 100 > 100urls.txt")
+# download, extract list of images URLs for parfaits, which are good data as not in
+# imagenet 1000 dataset this was trained on
+if not os.path.exists("pairfait_images/parfait_img_urls_randomized.txt"):
+    os.system("wget --directory-prefix parfait_images http://www.image-net.org/api/text/imagenet.synset.geturls?wnid=n07616386")
+    os.system("gshuf imagenet.synset.geturls\?wnid\=n07616386 > parfait_img_urls_randomized.txt")
 
-with open("100urls.txt") as f:
+# ran wc -l, 1230 images in file, make folders of every 25
+with open("parfait_img_urls_randomized.txt") as f:
     for line in f:
         break
         os.system("wget --tries=1 --directory-prefix images/0.0,1.0 " + line.split("\t")[1])
