@@ -8,3 +8,4 @@ images/
 *.jpg
 *urls.txt
 imagenet_balls
+mscoco/
