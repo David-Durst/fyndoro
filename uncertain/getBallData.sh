@@ -64,15 +64,14 @@ do
     if [ $i -gt 1 ]
     then
         cp -r $previousMergedSubset/* $mergedSubset
-        rm -rf $previousMergedSubset
     fi
     echo "Number of images in train 0.1,0.0"
-    ls -1 $mergedSubset/train/0.1,0.0 | wc -l
+    ls -1 $mergedSubset/train/1.0,0.0 | wc -l
     echo "Number of images in train 0.8,0.2"
     ls -1 $mergedSubset/train/0.8,0.2 | wc -l
     echo "Number of images in train 0.2,0.8"
     ls -1 $mergedSubset/train/0.2,0.8 | wc -l
     echo "Number of images in train 0.0,0.1"
-    ls -1 $mergedSubset/train/0.0,0.1 | wc -l
+    ls -1 $mergedSubset/train/0.0,1.0 | wc -l
     previousMergedSubset=$mergedSubset
 done
