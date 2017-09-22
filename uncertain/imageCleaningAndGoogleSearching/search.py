@@ -32,7 +32,7 @@ for imgFileName in imageFiles:
     notes = response.web_detection
 
     for imgToDownload in notes.partial_matching_images:
-        process = subprocess.Popen("wget --directory-prefix " + outputDir + " " + imgToDownload.url, shell=True)
+        process = subprocess.Popen("wget -t 3 --directory-prefix " + outputDir + " " + imgToDownload.url, shell=True)
         processList.append(process)
 
 for process in processList:
