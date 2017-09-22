@@ -37,9 +37,7 @@ do
         mkdir -p $subsetImages/val/$c
         # keep same validation images for every run
         gshuf -n $trainIncrements -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
-        echo eqq
         cp $images/val/$c/* $subsetImages/val/$c/
-        echo awfsad
         if [ $c == "1.0,0.0" ]
         then
             rm -rf $subsetImages/train/0.8,0.2/
@@ -61,7 +59,6 @@ do
     mergedSubset=$images/merged_$(expr $trainIncrements "*" $i)_training_images
     rm -rf $mergedSubset
     mkdir -p $mergedSubset
-    echo asdfasdf
     cp -r $subsetImages/* $mergedSubset
     rm -rf $subsetImages
     if [ $i -gt 1 ]
@@ -69,5 +66,13 @@ do
         cp -r $previousMergedSubset/* $mergedSubset
         rm -rf $previousMergedSubset
     fi
+    echo "Number of images in train 0.1,0.0"
+    ls -1 $mergedSubset/train/0.1,0.0 | wc -l
+    echo "Number of images in train 0.8,0.2"
+    ls -1 $mergedSubset/train/0.8,0.2 | wc -l
+    echo "Number of images in train 0.2,0.8"
+    ls -1 $mergedSubset/train/0.2,0.8 | wc -l
+    echo "Number of images in train 0.0,0.1"
+    ls -1 $mergedSubset/train/0.0,0.1 | wc -l
     previousMergedSubset=$mergedSubset
 done
