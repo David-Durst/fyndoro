@@ -57,7 +57,8 @@ do
 
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
-    mergedSubset=$images/merged_$(expr $trainIncrements "*" $i)_training_images
+    mergedSubset=$images/augmented_$(expr $trainIncrements "*" $i)
+    mergedSubsetNoAugmentation=$images/not_augmented_$(expr $trainIncrements "*" $i)
     rm -rf $mergedSubset
     mkdir -p $mergedSubset
     cp -r $subsetImages/* $mergedSubset
@@ -66,13 +67,25 @@ do
     then
         cp -r $previousMergedSubset/* $mergedSubset
     fi
-    echo "Number of images in train 0.1,0.0"
+    rm -rf $mergedSubsetNoAugmentation
+    mkdir -p $mergedSubsetNoAugmentation
+    mkdir -p $mergedSubsetNoAugmentation/train
+    mkdir -p $mergedSubsetNoAugmentation/val
+    cp $mergedSubset/train/0.0,1.0/* $mergedSubsetNoAugmentation/train/0.0,1.0/
+    cp $mergedSubset/train/1.0,0.0/* $mergedSubsetNoAugmentation/train/1.0,0.0/
+    cp $mergedSubset/val/0.0,1.0/* $mergedSubsetNoAugmentation/val/0.0,1.0/
+    cp $mergedSubset/val/1.0,0.0/* $mergedSubsetNoAugmentation/val/1.0,0.0/
+    echo "Number of images in train 1.0,0.0"
     ls -1 $mergedSubset/train/1.0,0.0 | wc -l
     echo "Number of images in train 0.8,0.2"
     ls -1 $mergedSubset/train/0.8,0.2 | wc -l
     echo "Number of images in train 0.2,0.8"
     ls -1 $mergedSubset/train/0.2,0.8 | wc -l
-    echo "Number of images in train 0.0,0.1"
+    echo "Number of images in train 0.0,1.0"
     ls -1 $mergedSubset/train/0.0,1.0 | wc -l
+    echo "Number of images in val 1.0,0.0"
+    ls -1 $mergedSubset/val/1.0,0.0 | wc -l
+    echo "Number of images in val 0.0,1.0"
+    ls -1 $mergedSubset/val/0.0,1.0 | wc -l
     previousMergedSubset=$mergedSubset
 done
