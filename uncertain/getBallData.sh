@@ -18,9 +18,9 @@ do
     mkdir -p $images/train/$c
     mkdir -p $images/val/$c
     # put all images for use in train first, then mv a subset of them to val
-    gshuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
+    shuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
     python imageCleaningAndGoogleSearching/clean.py $images/train/$c
-    gshuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
+    shuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
 done
 
 # split the datasets into 25 image groups
@@ -36,7 +36,7 @@ do
         mkdir -p $subsetImages/train/$c
         mkdir -p $subsetImages/val/$c
         # keep same validation images for every run
-        gshuf -n $trainIncrements -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
+        shuf -n $trainIncrements -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
         cp $images/val/$c/* $subsetImages/val/$c/
         if [ $c == "1.0,0.0" ]
         then
