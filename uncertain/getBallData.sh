@@ -64,5 +64,4 @@ do
         cp -r $previousMergedSubset $mergedSubset
     fi
     previousMergedSubset=mergedSubset
-    exit
 done
