@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # note, assume already have imagenet_balls and all images from datasets extracted into an all subdirectory for each type
-scriptDir=$(dirname "$(greadlink -f "$0")")
+scriptDir=$(dirname "$(readlink -f "$0")")
+echo $scriptDir
 images=$scriptDir/imagenet_balls
 categoryGroups=("1.0,0.0" "0.0,1.0")
 googleCat="1.0,0.0"
