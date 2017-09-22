@@ -63,9 +63,11 @@ do
     mkdir -p $mergedSubset
     echo asdfasdf
     cp -r $subsetImages/* $mergedSubset
+    rm -rf $subsetImages
     if [ $i -gt 1 ]
     then
-        cp -r $previousMergedSubset $mergedSubset
+        cp -r $previousMergedSubset/* $mergedSubset
+        rm -rf $previousMergedSubset
     fi
     previousMergedSubset=$mergedSubset
 done
