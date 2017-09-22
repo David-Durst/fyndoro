@@ -17,7 +17,7 @@ touch $output_file
 echo "data_dir,num_labeled,best_val_acc" > $output_file
 
 model_output_folder=$scriptDir/ballModels
-rm -f $model_output_folder
+rm -rf $model_output_folder
 mkdir -p $model_output_folder
 
 for n in "${numImages[@]}"
