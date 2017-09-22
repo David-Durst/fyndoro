@@ -7,7 +7,7 @@ googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
 valImages=700
 trainImages=200
-trainIncrements=25
+trainIncrements=2
 numIncrements=$(expr $trainImages / $trainIncrements)
 
 # get all the training and validation data cleaned and split up
@@ -43,20 +43,20 @@ do
             rm -rf $subsetImages/train/0.8,0.2/
             mkdir -p $subsetImages/train/0.8,0.2/
             python $scriptDir/imageCleaningAndGoogleSearching/search.py $subsetImages/train/$c/ $subsetImages/train/0.8,0.2/
-            python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/$0.8,0.2/
+            python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/0.8,0.2/
         fi
         if [ $c == "0.0,1.0" ]
         then
             rm -rf $subsetImages/train/0.2,0.8/
             mkdir -p $subsetImages/train/0.2,0.8/
             python $scriptDir/imageCleaningAndGoogleSearching/search.py $subsetImages/train/$c/ $subsetImages/train/0.2,0.8/
-            python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/$0.2,0.8/
+            python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/0.2,0.8/
         fi
     done
 
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
-    mergedSubset=$images/merged_$(expr $trainIncrements * $i)_training_images
+    mergedSubset=$images/merged_$(expr $trainIncrements "*" $i)_training_images
     mkdir -p $mergedSubset
     cp -r $subsetCatImages $mergedSubset
     if [ $i -gt 1 ]
