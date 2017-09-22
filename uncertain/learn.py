@@ -16,10 +16,11 @@ from uncertain.uncertainCrossEntropyLoss import UncertainCrossEntropyLoss
 import sys
 import os
 
-# inputs should be directory_of_data number_positive_examples output_file
+# inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
 num_positive_training = sys.argv[2]
 output_file = sys.argv[3]
+model_output_dir = sys.argv[4]
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -130,7 +131,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
     print('Training complete in {:.0f}m {:.0f}s'.format(
         time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
-    return best_model
+    return (best_model, best_acc)
 
 
 def exp_lr_scheduler(optimizer, epoch, init_lr=0.001, lr_decay_epoch=7):
@@ -157,8 +158,10 @@ criterion = UncertainCrossEntropyLoss()
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
-model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
+model_ft, best_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
 
 with open(output_file, 'a') as f:
-    f.write(data_dir + "," + str(num_positive_training*2) + "," + str(model_ft) + "\n")
+    f.write(data_dir + "," + str(num_positive_training*2) + "," + str(best_acc) + "\n")
+
+torch.save(model_ft.state_dict(), model_output_dir + "/" + str(num_positive_training*2))
