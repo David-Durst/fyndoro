@@ -14,6 +14,7 @@ import time
 import copy
 from uncertain.uncertainCrossEntropyLoss import UncertainCrossEntropyLoss
 import sys
+import os
 
 # inputs should be directory_of_data number_positive_examples output_file
 data_dir = sys.argv[1]
@@ -37,7 +38,7 @@ data_transforms = {
     ]),
 }
 
-dsets = {x: datasets.ImageFolder(data_dir, data_transforms[x])
+dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
          for x in ['train', 'val']}
 
 dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
