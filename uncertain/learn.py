@@ -1,5 +1,5 @@
 # License: BSD
-# Author: Sasank Chilamkurthy
+# Author: David Durst - based on http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html by Sasank Chilamkurthy
 
 from __future__ import print_function, division
 
@@ -7,17 +7,17 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
-import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
 import time
 import copy
-import os
 from uncertain.uncertainCrossEntropyLoss import UncertainCrossEntropyLoss
 import sys
 
-plt.ion()   # interactive mode
+# inputs should be directory_of_data number_positive_examples output_file
+data_dir = sys.argv[1]
+num_positive_training = sys.arg[2]
+output_file = sys.argv[3]
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -35,8 +35,6 @@ data_transforms = {
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
 }
-
-data_dir = sys.argv[1]
 
 dsets = {x: datasets.ImageFolder(data_dir, data_transforms[x])
          for x in ['train', 'val']}
@@ -159,3 +157,6 @@ optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
+
+with open(output_file, 'a') as f:
+    f.write(data_dir + "," + str(num_positive_training*2) + "," + str(model_ft) + "\n")
