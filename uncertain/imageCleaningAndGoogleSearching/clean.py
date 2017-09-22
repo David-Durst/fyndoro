@@ -15,4 +15,8 @@ for f in anyFiles:
         os.remove(relPathAndName)
     # otherwise, reshape them
     else:
-        os.system("convert -resize 500x500 \'" + relPathAndName + "\' \'" + relPathAndName + "\'")
+        retVal = os.system("convert -resize 500x500 \'" + relPathAndName + "\' \'" + relPathAndName + "\'")
+        if retVal != 0:
+            os.remove(relPathAndName)
+
+
