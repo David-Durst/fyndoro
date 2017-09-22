@@ -3,7 +3,8 @@
 scriptDir=$(dirname "$(readlink -f "$0")")
 echo $scriptDir
 imagesParent=$scriptDir/imagenet_balls
-numImages=(25 50 75 100 125 150 175 200)
+#numImages=(25 50 75 100 125 150 175 200)
+numImages=(25)
 
 #get in directory above script for running uncertain.learn correctly
 origDir=$(pwd)
