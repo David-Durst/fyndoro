@@ -5,6 +5,7 @@ import os
 import io
 from os.path import isfile, join, splitext
 import sys
+import subprocess
 
 # first input is input directory to read from
 # second input is output directory
@@ -16,6 +17,8 @@ client = vision.ImageAnnotatorClient()
 
 # from https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
 imageFiles = [f for f in os.listdir(dirToDownload) if isfile(join(dirToDownload, f))]
+
+processList = []
 
 # go through each file in the directory and download all partial matches
 for imgFileName in imageFiles:
@@ -29,4 +32,8 @@ for imgFileName in imageFiles:
     notes = response.web_detection
 
     for imgToDownload in notes.partial_matching_images:
-        os.system("wget --directory-prefix " + outputDir + " " + imgToDownload.url)
+        process = subprocess.Popen(["wget", " --directory-prefix ", outputDir, imgToDownload.url])
+        processList.append(process)
+
+for process in processList:
+    process.wait()
