@@ -15,10 +15,14 @@ rm -f $output_file
 touch $output_file
 echo "data_dir,num_labeled,best_val_acc" > $output_file
 
+model_output_folder=$scriptDir/ballModels
+rm -f $model_output_folder
+mkdir -p $model_output_folder
+
 for n in "${numImages[@]}"
 do
-    python -m uncertain.learn $imagesParent/augmented_${n}/ $n $output_file
-    python -m uncertain.learn $imagesParent/not_augmented_${n}/ $n $output_file
+    python -m uncertain.learn $imagesParent/augmented_${n}/ $n $output_file $model_output_folder
+    python -m uncertain.learn $imagesParent/not_augmented_${n}/ $n $output_file $model_output_folder
 done
 
 cd $origDir
