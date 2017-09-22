@@ -71,10 +71,10 @@ do
     mkdir -p $mergedSubsetNoAugmentation
     mkdir -p $mergedSubsetNoAugmentation/train
     mkdir -p $mergedSubsetNoAugmentation/val
-    cp $mergedSubset/train/0.0,1.0/* $mergedSubsetNoAugmentation/train/0.0,1.0/
-    cp $mergedSubset/train/1.0,0.0/* $mergedSubsetNoAugmentation/train/1.0,0.0/
-    cp $mergedSubset/val/0.0,1.0/* $mergedSubsetNoAugmentation/val/0.0,1.0/
-    cp $mergedSubset/val/1.0,0.0/* $mergedSubsetNoAugmentation/val/1.0,0.0/
+    cp -r $mergedSubset/train/0.0,1.0 $mergedSubsetNoAugmentation/train/
+    cp -r $mergedSubset/train/1.0,0.0 $mergedSubsetNoAugmentation/train/
+    cp -r $mergedSubset/val/0.0,1.0 $mergedSubsetNoAugmentation/val/
+    cp -r $mergedSubset/val/1.0,0.0 $mergedSubsetNoAugmentation/val/
     echo "Number of images in train 1.0,0.0"
     ls -1 $mergedSubset/train/1.0,0.0 | wc -l
     echo "Number of images in train 0.8,0.2"
