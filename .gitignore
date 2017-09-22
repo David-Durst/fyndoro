@@ -9,3 +9,5 @@ images/
 *urls.txt
 imagenet_balls
 mscoco/
+coco/
+log.txt*

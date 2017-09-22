@@ -1,0 +1,1 @@
+for hymenoptera dataset, ants are label 1.0,0.0 and bees are 0.0,1.0
