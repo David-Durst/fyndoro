@@ -11,3 +11,4 @@ imagenet_balls
 mscoco/
 coco/
 log.txt*
+*.csv
