@@ -7,7 +7,7 @@ googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
 valImages=700
 trainImages=200
-trainIncrements=2
+trainIncrements=25
 numIncrements=$(expr $trainImages / $trainIncrements)
 
 # get all the training and validation data cleaned and split up
@@ -37,7 +37,9 @@ do
         mkdir -p $subsetImages/val/$c
         # keep same validation images for every run
         gshuf -n $trainIncrements -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
+        echo eqq
         cp $images/val/$c/* $subsetImages/val/$c/
+        echo awfsad
         if [ $c == "1.0,0.0" ]
         then
             rm -rf $subsetImages/train/0.8,0.2/
@@ -57,11 +59,13 @@ do
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
     mergedSubset=$images/merged_$(expr $trainIncrements "*" $i)_training_images
+    rm -rf $mergedSubset
     mkdir -p $mergedSubset
-    cp -r $subsetCatImages $mergedSubset
+    echo asdfasdf
+    cp -r $subsetImages/* $mergedSubset
     if [ $i -gt 1 ]
     then
         cp -r $previousMergedSubset $mergedSubset
     fi
-    previousMergedSubset=mergedSubset
+    previousMergedSubset=$mergedSubset
 done
