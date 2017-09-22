@@ -15,7 +15,7 @@ rm -f $output_file
 touch $output_file
 echo "data_dir,num_labeled,best_val_acc" > $output_file
 
-for n in "${categoryGroups[@]}"
+for n in "${numImages[@]}"
 do
     python -m uncertain.learn $imagesParent/augmented_${n}/ $n $output_file
     python -m uncertain.learn $imagesParent/not_augmented_${n}/ $n $output_file

@@ -16,7 +16,7 @@ import sys
 
 # inputs should be directory_of_data number_positive_examples output_file
 data_dir = sys.argv[1]
-num_positive_training = sys.arg[2]
+num_positive_training = sys.argv[2]
 output_file = sys.argv[3]
 
 # Data augmentation and normalization for training
