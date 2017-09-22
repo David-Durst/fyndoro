@@ -12,3 +12,4 @@ mscoco/
 coco/
 log.txt*
 *.csv
+output/
