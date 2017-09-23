@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # note, assume already have images into two folders, 1.0,0.0 and 0.0,1.0 for the two classes
-# the location of the folder containing those directories is the input
+# the absolute location of the folder containing those directories is the input
 scriptDir=$(dirname "$(readlink -f "$0")")
-echo $scriptDir
-images=$scriptDir/$1
+images=$1
 categoryGroups=("1.0,0.0" "0.0,1.0")
 googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
@@ -11,11 +10,11 @@ trainImages=200
 trainIncrements=25
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
-if [ $cat1Images > $cat2Images ]
+if [ $cat1Images -gt $cat2Images ]
 then
     valImages=$(expr $cat2Images - $trainImages)
 else
-    valImages=$(expr $cat2Images - $trainImages)
+    valImages=$(expr $cat1Images - $trainImages)
 fi
 numIncrements=$(expr $trainImages / $trainIncrements)
 

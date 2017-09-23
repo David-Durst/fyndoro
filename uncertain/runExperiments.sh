@@ -5,7 +5,6 @@ imagesParent=$(readlink -f "$1")
 outputName=$2
 scriptDir=$(dirname "$(readlink -f "$0")")
 numImages=(25 50 75 100 125 150 175 200)
-
 $scriptDir/makeDataForExperiments.sh $imagesParent
 
 #get in directory above script for running uncertain.learn correctly
