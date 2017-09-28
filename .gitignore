@@ -13,3 +13,4 @@ coco/
 log.txt*
 *.csv
 output/
+downloadImagenet.sh
