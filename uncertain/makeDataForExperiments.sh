@@ -87,7 +87,8 @@ do
     cp -r $mergedSubset $mergedSubsetNoProb
     mv $mergedSubsetNoProb/train/0.2,0.8/* $mergedSubsetNoProb/train/0.0,1.0
     mv $mergedSubsetNoProb/train/0.8,0.2/* $mergedSubsetNoProb/train/1.0,0.0
-    rmdir $mergedSubsetNoProb
+    rmdir $mergedSubsetNoProb/train/0.2,0.8
+    rmdir $mergedSubsetNoProb/train/0.8,0.2
     echo "Number of images in train 1.0,0.0"
     ls -1 $mergedSubset/train/1.0,0.0 | wc -l
     echo "Number of images in train 0.8,0.2"
