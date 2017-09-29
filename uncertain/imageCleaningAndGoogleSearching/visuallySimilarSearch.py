@@ -41,7 +41,7 @@ for imgFileName in imageFiles:
     responseJson = json.loads(response.text)
 
     for imgToDownload in responseJson['responses'][0]['webDetection']['visuallySimilarImages']:
-        process = subprocess.Popen("wget -t 3 --directory-prefix " + outputDir + " " + imgToDownload['url'], shell=True)
+        process = subprocess.Popen("wget --quiet -t 3 --directory-prefix " + outputDir + " " + imgToDownload['url'], shell=True)
         processList.append(process)
 
 for process in processList:
