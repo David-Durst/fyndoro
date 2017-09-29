@@ -51,14 +51,14 @@ do
         then
             rm -rf $subsetImages/train/0.8,0.2/
             mkdir -p $subsetImages/train/0.8,0.2/
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.8,0.2/
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.8,0.2/ $scriptDir/../API_KEY
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/0.8,0.2/
         fi
         if [ $c == "0.0,1.0" ]
         then
             rm -rf $subsetImages/train/0.2,0.8/
             mkdir -p $subsetImages/train/0.2,0.8/
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.2,0.8/
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.2,0.8/ $scriptDir/../API_KEY
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/0.2,0.8/
         fi
     done
