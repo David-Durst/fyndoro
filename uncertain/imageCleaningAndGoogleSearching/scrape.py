@@ -30,7 +30,7 @@ with Browser() as browser:
         # go from url reverse image to file upload image
         #browser.find_by_text("Upload an image").click()
         # upload a file
-        browser.attach_file("encoded_image", imgFileName)
+        browser.attach_file("encoded_image", join(dirToDownload, imgFileName))
         browser.find_by_text("Visually similar images").click()
         images = browser.find_by_css(".rg_ic.rg_i")
         numDownloaded = 0

@@ -10,6 +10,7 @@ trainImages=200
 trainIncrements=25
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
+export MOZ_HEADLESS=1
 if [ $cat1Images -gt $cat2Images ]
 then
     valImages=$(expr $cat2Images - $trainImages)
@@ -27,7 +28,7 @@ do
     mkdir -p $images/val/$c
     # put all images for use in train first, then mv a subset of them to val
     shuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
-    python imageCleaningAndGoogleSearching/clean.py $images/train/$c
+    python $scriptDir/imageCleaningAndGoogleSearching/clean.py $images/train/$c
     shuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
 done
 
