@@ -31,7 +31,9 @@ with Browser() as browser:
         #browser.find_by_text("Upload an image").click()
         # upload a file
         browser.attach_file("encoded_image", join(dirToDownload, imgFileName))
-        browser.find_by_text("Visually similar images").click()
+        visSimLink = browser.find_by_text("Visually similar images")
+        if len(visSimLink) == 0:
+            continue
         images = browser.find_by_css(".rg_ic.rg_i")
         numDownloaded = 0
 
@@ -42,6 +44,7 @@ with Browser() as browser:
                 break
             image.click()
             browser.find_by_css(".irc_fsl.irc_but.i3596")[1].click()
+            time.sleep(0.5)
             imgToDownload = browser.windows[1].url
             process = subprocess.Popen("wget -t 3 --directory-prefix " + outputDir + " " + imgToDownload, shell=True)
             browser.windows[1].close()
