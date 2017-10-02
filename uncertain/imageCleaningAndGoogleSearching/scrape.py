@@ -42,7 +42,9 @@ with Browser() as browser:
                 break
             image.click()
             browser.find_by_css(".irc_fsl.irc_but.i3596")[1].click()
-            process = subprocess.Popen("wget -t 3 --directory-prefix " + outputDir + " " + imgToDownload.url, shell=True)
+            imgToDownload = browser.windows[1].url
+            process = subprocess.Popen("wget -t 3 --directory-prefix " + outputDir + " " + imgToDownload, shell=True)
+            browser.windows[1].close()
             processList.append(process)
             numDownloaded += 1
 
