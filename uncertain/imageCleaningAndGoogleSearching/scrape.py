@@ -24,7 +24,7 @@ with Browser() as browser:
         start_time = time.time()
         # wait a random number of seconds between 3 and 5 to ensure don't get blocked
         # by google for being a bot
-        wait_time = randint(3,5)
+        wait_time = randint(7,10)
         # get the reverse image section open
         browser.find_by_id("qbi").click()
         # go from url reverse image to file upload image

@@ -48,9 +48,6 @@ dependencies:
 - wheel=0.29.0=py36_0
 - xz=5.2.3=0
 - zlib=1.2.11=0
-- cuda80=1.0=0
-- pytorch=0.2.0=py36h53baedd_4cu80
-- torchvision=0.1.9=py36h7584368_1
 - pip:
   - cachetools==2.0.1
   - chardet==3.0.4
@@ -74,7 +71,6 @@ dependencies:
   - rsa==3.4.2
   - selenium==3.5.0
   - splinter==0.7.6
-  - torch==0.2.0.post4
   - uritemplate==3.0.0
   - urllib3==1.22
 prefix: /lfs/1/durst/anaconda3/envs/fyndoro
