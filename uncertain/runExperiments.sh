@@ -24,6 +24,7 @@ mkdir -p $model_output_folder
 for n in "${numImages[@]}"
 do
     python -m uncertain.learn $imagesParent/augmented_${n}/ $n $output_file $model_output_folder
+    python -m uncertain.learn $imagesParent/augmented_${n}_noprob/ $n $output_file $model_output_folder
     python -m uncertain.learn $imagesParent/not_augmented_${n}/ $n $output_file $model_output_folder
 done
 

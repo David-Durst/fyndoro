@@ -7,6 +7,7 @@
 3. Get access to the Google Vision API - https://cloud.google.com/vision/docs/before-you-begin
 3. Provide gcloud access to the application - gcloud auth application-default login --no-launch-browser
     a. documentation for command - https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login
+3. create a google API key and put in in the file API_KEY in the root of this project - https://support.google.com/cloud/answer/6158862?hl=en
 3. Install imagemagick - brew install imagemagick for mac
 3. Install gshuf (or shuf on linux) - brew install coreutils for mac
 4. Run the learner - python -m uncertain.learn

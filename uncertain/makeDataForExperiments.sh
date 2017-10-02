@@ -51,14 +51,14 @@ do
         then
             rm -rf $subsetImages/train/0.8,0.2/
             mkdir -p $subsetImages/train/0.8,0.2/
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.8,0.2/
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.8,0.2/ $scriptDir/../API_KEY
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/0.8,0.2/
         fi
         if [ $c == "0.0,1.0" ]
         then
             rm -rf $subsetImages/train/0.2,0.8/
             mkdir -p $subsetImages/train/0.2,0.8/
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.2,0.8/
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $subsetImages/train/$c/ $subsetImages/train/0.2,0.8/ $scriptDir/../API_KEY
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $subsetImages/train/0.2,0.8/
         fi
     done
@@ -66,6 +66,7 @@ do
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
     mergedSubset=$images/augmented_$(expr $trainIncrements "*" $i)
+    mergedSubsetNoProb=${mergedSubset}_noprob
     mergedSubsetNoAugmentation=$images/not_augmented_$(expr $trainIncrements "*" $i)
     rm -rf $mergedSubset
     mkdir -p $mergedSubset
@@ -83,10 +84,15 @@ do
     cp -r $mergedSubset/train/1.0,0.0 $mergedSubsetNoAugmentation/train/
     cp -r $mergedSubset/val/0.0,1.0 $mergedSubsetNoAugmentation/val/
     cp -r $mergedSubset/val/1.0,0.0 $mergedSubsetNoAugmentation/val/
+    cp -r $mergedSubset $mergedSubsetNoProb
+    mv $mergedSubsetNoProb/train/0.2,0.8/* $mergedSubsetNoProb/train/0.0,1.0
+    mv $mergedSubsetNoProb/train/0.8,0.2/* $mergedSubsetNoProb/train/1.0,0.0
+    rmdir $mergedSubsetNoProb/train/0.2,0.8
+    rmdir $mergedSubsetNoProb/train/0.8,0.2
     echo "Number of images in train 1.0,0.0"
     ls -1 $mergedSubset/train/1.0,0.0 | wc -l
     echo "Number of images in train 0.8,0.2"
-    ls -1 $mergedSubset/train/0.8,0.2 | wc -l
+    ls -1 $mergedSubset/train/0.0,1.0 | wc -l
     echo "Number of images in train 0.2,0.8"
     ls -1 $mergedSubset/train/0.2,0.8 | wc -l
     echo "Number of images in train 0.0,1.0"
@@ -95,5 +101,9 @@ do
     ls -1 $mergedSubset/val/1.0,0.0 | wc -l
     echo "Number of images in val 0.0,1.0"
     ls -1 $mergedSubset/val/0.0,1.0 | wc -l
+    echo "Number of images in noprob train 1.0,0.0"
+    ls -1 $mergedSubsetNoProb/train/1.0,0.0 | wc -l
+    echo "Number of images in noprob train 0.0,1.0"
+    ls -1 $mergedSubsetNoProb/train/0.0,1.0 | wc -l
     previousMergedSubset=$mergedSubset
 done
