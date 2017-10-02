@@ -41,7 +41,7 @@ with Browser() as browser:
             if numDownloaded > imagesToDownloadPerImage:
                 break
             image.click()
-            browser.find_by_css("irc_fsl.irc_but.i3596")[1].click()
+            browser.find_by_css(".irc_fsl.irc_but.i3596")[1].click()
             process = subprocess.Popen("wget -t 3 --directory-prefix " + outputDir + " " + imgToDownload.url, shell=True)
             processList.append(process)
             numDownloaded += 1
