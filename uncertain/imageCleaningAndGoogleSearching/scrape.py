@@ -50,8 +50,9 @@ with Browser() as browser:
                 continue
             imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
             print("timeout 15 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir)
-            process = subprocess.Popen("timeout 15 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir, shell=True)
-            processList.append(process)
+            process = subprocess.Popen("timeout 30 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir, shell=True)
+            #processList.append(process)
+            process.wait()
             numDownloaded += 1
 
 
