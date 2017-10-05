@@ -8,8 +8,9 @@ createDatasets=true
 categoryGroups=("1.0,0.0" "0.0,1.0")
 googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
-trainImages=200
-trainIncrements=25
+trainImages=100
+# note that train increments need to sum to trainImages
+trainIncrements=(1 1 1 2 5 10 20 60)
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
 export MOZ_HEADLESS=1
@@ -19,7 +20,7 @@ then
 else
     valImages=$(expr $cat1Images - $trainImages)
 fi
-numIncrements=$(expr $trainImages / $trainIncrements)
+numIncrements=${#trainIncrements[@]}
 
 # get all the training and validation data cleaned and split up
 if [ $createTrainVal == true ] ; then
@@ -37,15 +38,25 @@ if [ $createTrainVal == true ] ; then
 fi
 
 if [ $createDatasets == false ] ; then
+    rm -rf $images/trainbackup
+    rm -rf $images/valbackup
     cp -r $images/train $images/trainbackup
     cp -r $images/val $images/valbackup
-    quit
+    exit 0
 fi
 
+if [ $createDatasets == true ] && [ $createTrainVal == false ] ; then
+    rm -rf $images/train
+    rm -rf $images/val
+    cp -r $images/trainbackup $images/train
+    cp -r $images/valbackup $images/val
+fi
+
+sumIncrementsSoFar=0
 # split the datasets into 25 image groups
 for i in $(seq $numIncrements)
 do
-    subsetImages=$images/subset_${i}_of_${trainIncrements}_1.0,0.0_training_images
+    subsetImages=$images/subset_${i}_of_${trainIncrements[$i]}_1.0,0.0_training_images
     rm -rf $subsetImages
     mkdir -p $subsetImages
     mkdir -p $subsetImages/train
@@ -55,7 +66,7 @@ do
         mkdir -p $subsetImages/train/$c
         mkdir -p $subsetImages/val/$c
         # keep same validation images for every run
-        shuf -n $trainIncrements -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
+        shuf -n ${trainIncrements[$i]} -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
         cp $images/val/$c/* $subsetImages/val/$c/
         if [ $c == "1.0,0.0" ]
         then
@@ -75,9 +86,10 @@ do
 
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
-    mergedSubset=$images/augmented_$(expr $trainIncrements "*" $i)
+    sumIncrementsSoFar=$(expr $sumIncrementsSoFar + ${trainIncrements[$i]})
+    mergedSubset=$images/augmented_${sumIncrementsSoFar}
     mergedSubsetNoProb=${mergedSubset}_noprob
-    mergedSubsetNoAugmentation=$images/not_augmented_$(expr $trainIncrements "*" $i)
+    mergedSubsetNoAugmentation=$images/not_augmented_${sumIncrementsSoFar}
     rm -rf $mergedSubset
     mkdir -p $mergedSubset
     cp -r $subsetImages/* $mergedSubset
@@ -94,6 +106,7 @@ do
     cp -r $mergedSubset/train/1.0,0.0 $mergedSubsetNoAugmentation/train/
     cp -r $mergedSubset/val/0.0,1.0 $mergedSubsetNoAugmentation/val/
     cp -r $mergedSubset/val/1.0,0.0 $mergedSubsetNoAugmentation/val/
+    rm -rf $mergedSubsetNoProb
     cp -r $mergedSubset $mergedSubsetNoProb
     mv $mergedSubsetNoProb/train/0.2,0.8/* $mergedSubsetNoProb/train/0.0,1.0
     mv $mergedSubsetNoProb/train/0.8,0.2/* $mergedSubsetNoProb/train/1.0,0.0
