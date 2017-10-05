@@ -4,6 +4,8 @@
 export MOZ_HEADLESS=1
 scriptDir=$(dirname "$(readlink -f "$0")")
 images=$1
+createTrainVal=true
+createDatasets=true
 categoryGroups=("1.0,0.0" "0.0,1.0")
 googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
@@ -21,17 +23,25 @@ fi
 numIncrements=$(expr $trainImages / $trainIncrements)
 
 # get all the training and validation data cleaned and split up
-for c in "${categoryGroups[@]}"
-do
-    rm -rf $images/train/$c
-    rm -rf $images/val/$c
-    mkdir -p $images/train/$c
-    mkdir -p $images/val/$c
-    # put all images for use in train first, then mv a subset of them to val
-    shuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
-    python $scriptDir/imageCleaningAndGoogleSearching/clean.py $images/train/$c
-    shuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
-done
+if [ $createTrainVal == true ] ; then
+    for c in "${categoryGroups[@]}"
+    do
+        rm -rf $images/train/$c
+        rm -rf $images/val/$c
+        mkdir -p $images/train/$c
+        mkdir -p $images/val/$c
+        # put all images for use in train first, then mv a subset of them to val
+        shuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
+        python $scriptDir/imageCleaningAndGoogleSearching/clean.py $images/train/$c
+        shuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
+    done
+fi
+
+if [ $createDatasets == false ] ; then
+    cp -r $images/train $images/trainbackup
+    cp -r $images/val $images/valbackup
+    quit
+fi
 
 # split the datasets into 25 image groups
 for i in $(seq $numIncrements)

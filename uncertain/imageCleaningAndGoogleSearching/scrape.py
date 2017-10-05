@@ -6,13 +6,11 @@ from os.path import isfile, join
 import os
 import sys
 
-
 # first input is input directory to read from
 # second input is output directory
 dirToDownload = sys.argv[1]
 outputDir = sys.argv[2]
 scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
-
 
 imagesToDownloadPerImage=30
 
@@ -62,4 +60,3 @@ with Browser() as browser:
         #end_time = time.time()
         #if end_time > start_time + wait_time:
         #    time.sleep(end_time - start_time - wait_time)
-
