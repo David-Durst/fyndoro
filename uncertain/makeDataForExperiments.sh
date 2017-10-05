@@ -37,6 +37,8 @@ if [ $createTrainVal == true ] ; then
 fi
 
 if [ $createDatasets == false ] ; then
+    cp -r $images/train $images/trainbackup
+    cp -r $images/val $images/valbackup
     quit
 fi
 
