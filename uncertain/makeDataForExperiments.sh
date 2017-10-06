@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # note, assume already have images into two folders, 1.0,0.0 and 0.0,1.0 for the two classes
 # the absolute location of the folder containing those directories is the input
-export MOZ_HEADLESS=1
 scriptDir=$(dirname "$(readlink -f "$0")")
+set -x
 images=$1
-createTrainVal=true
-createDatasets=false
+createTrainVal=false
+createDatasets=true
 categoryGroups=("1.0,0.0" "0.0,1.0")
 googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
-trainImages=100
+trainImages=2
 # note that train increments need to sum to trainImages
-trainIncrements=(1 1 1 2 5 10 20 60)
+trainIncrements=(1 1)
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
 export MOZ_HEADLESS=1
@@ -21,6 +21,7 @@ then
 else
     valImages=$(expr $cat1Images - $trainImages)
 fi
+valImages=10
 numIncrements=${#trainIncrements[@]}
 
 # get all the training and validation data cleaned and split up
