@@ -56,7 +56,8 @@ sumIncrementsSoFar=0
 # split the datasets into 25 image groups
 for i in $(seq $numIncrements)
 do
-    subsetImages=$images/subset_${i}_of_${trainIncrements[$i]}_1.0,0.0_training_images
+    idx=$(expr $i - 1)
+    subsetImages=$images/subset_${i}_of_${trainIncrements[$idx]}_1.0,0.0_training_images
     rm -rf $subsetImages
     mkdir -p $subsetImages
     mkdir -p $subsetImages/train
@@ -66,7 +67,7 @@ do
         mkdir -p $subsetImages/train/$c
         mkdir -p $subsetImages/val/$c
         # keep same validation images for every run
-        shuf -n ${trainIncrements[$i]} -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
+        shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
         cp $images/val/$c/* $subsetImages/val/$c/
         if [ $c == "1.0,0.0" ]
         then
@@ -86,7 +87,7 @@ do
 
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
-    sumIncrementsSoFar=$(expr $sumIncrementsSoFar + ${trainIncrements[$i]})
+    sumIncrementsSoFar=$(expr $sumIncrementsSoFar + ${trainIncrements[$idx]})
     mergedSubset=$images/augmented_${sumIncrementsSoFar}
     mergedSubsetNoProb=${mergedSubset}_noprob
     mergedSubsetNoAugmentation=$images/not_augmented_${sumIncrementsSoFar}
