@@ -29,10 +29,12 @@ with Browser() as browser:
         browser.find_by_id("qbi").click()
         # upload a file
         browser.attach_file("encoded_image", join(dirToDownload, imgFileName))
+        time.sleep(0.5)
         visSimLink = browser.find_by_text("Visually similar images")
         if len(visSimLink) == 0:
             continue
         visSimLink.click()
+        time.sleep(0.5)
         images = [x['href'] for x in browser.find_by_css(".rg_l")]
         numDownloaded = 0
 
@@ -44,6 +46,7 @@ with Browser() as browser:
             if numDownloaded > imagesToDownloadPerImage:
                 break
             browser.visit(image)
+            time.sleep(0.1)
             if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
                 continue
             imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
