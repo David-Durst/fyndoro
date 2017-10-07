@@ -18,7 +18,7 @@ import os
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
-num_positive_training = sys.argv[2]
+num_training_str = sys.argv[2]
 output_file = sys.argv[3]
 model_output_dir = sys.argv[4]
 
@@ -162,6 +162,6 @@ model_ft, best_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_sched
                        num_epochs=25)
 
 with open(output_file, 'a') as f:
-    f.write(data_dir + "," + str(int(num_positive_training)*2) + "," + str(best_acc) + "\n")
+    f.write(data_dir + "," + num_training_str + "," + str(best_acc) + "\n")
 
-torch.save(model_ft.state_dict(), model_output_dir + "/" + str(int(num_positive_training)*2))
+torch.save(model_ft.state_dict(), model_output_dir + "/" + num_training_str)

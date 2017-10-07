@@ -12,7 +12,7 @@ dirToDownload = sys.argv[1]
 outputDir = sys.argv[2]
 scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
-imagesToDownloadPerImage=30
+imagesToDownloadPerImage=100
 
 # from https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
 imageFiles = [f for f in os.listdir(dirToDownload) if isfile(join(dirToDownload, f))]
