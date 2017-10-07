@@ -31,6 +31,7 @@ mkdir -p $model_output_folder
 
 for n in "${numImages[@]}"
 do
+    echo "Running for experiments $n"
     num_t1=$(ls -1 $imagesParent/augmented_${n}_noprob/train/1.0,0.0/)
     num_t0=$(ls -1 $imagesParent/augmented_${n}_noprob/train/0.0,1.0/)
     num_total=$(expr $num_t0 + $num_t1)
