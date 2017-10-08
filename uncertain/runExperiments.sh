@@ -34,9 +34,9 @@ do
     echo "Running for experiments $n"
     num_t1=$(ls -1 $imagesParent/augmented_${n}_noprob/train/1.0,0.0/ | wc -l)
     num_t0=$(ls -1 $imagesParent/augmented_${n}_noprob/train/0.0,1.0/ | wc -l)
-    num_total=$num_t1,$num_t0
+    num_total=${num_t1}_${num_t0}
     num_training=$(expr 2 \* $n)
-    num_str=$num_training,$num_total
+    num_str=${num_training}_${num_total}
     python -m uncertain.learn $imagesParent/augmented_${n}/ $num_str $output_file_augmented $model_output_folder
     python -m uncertain.learn $imagesParent/augmented_${n}_noprob/ $num_str $output_file_noprob $model_output_folder
     python -m uncertain.learn $imagesParent/not_augmented_${n}/ $num_str $output_file_notaugmented $model_output_folder
