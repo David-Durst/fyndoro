@@ -5,4 +5,4 @@ wnid=$1
 output_dir=$(readlink -f "$2")
 api_key=$(cat $scriptDir/../IMAGENET_API_KEY)
 
-wget http://www.image-net.org/download/synset?wnid=${wnid}&username=durst&accesskey=${api_key}release=latest&src=stanford
+wget --directory-prefix $output_dir http://www.image-net.org/download/synset?wnid=${wnid}&username=durst&accesskey=${api_key}release=latest&src=stanford
