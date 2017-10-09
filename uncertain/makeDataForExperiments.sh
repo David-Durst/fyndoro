@@ -4,14 +4,14 @@
 scriptDir=$(dirname "$(readlink -f "$0")")
 set -x
 images=$1
-createTrainVal=false
+createTrainVal=true
 createDatasets=true
 categoryGroups=("1.0,0.0" "0.0,1.0")
 googleCat="1.0,0.0"
 googleCatOutput="0.8,0.2"
-trainImages=2
+trainImages=100
 # note that train increments need to sum to trainImages
-trainIncrements=(1 1)
+trainIncrements=(1 1 3 5 10)
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
 export MOZ_HEADLESS=1
@@ -21,7 +21,6 @@ then
 else
     valImages=$(expr $cat1Images - $trainImages)
 fi
-valImages=10
 numIncrements=${#trainIncrements[@]}
 
 # get all the training and validation data cleaned and split up
