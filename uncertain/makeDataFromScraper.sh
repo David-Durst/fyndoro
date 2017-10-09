@@ -12,10 +12,6 @@ destinationServer=$2
 numTrials=3
 for i in $(seq $numTrials)
 do
-    ./makeDataForExperiments.sh $scriptDir/$imageDirectory/
-    rsync -a $scriptDir/$imageDirectory ${destinationServer}_$i
-    rm -rf $scriptDir/$imageDirectory/augmented*
-    rm -rf $scriptDir/$imageDirectory/not_augmented*
-    rm -rf $scriptDir/$imageDirectory/train
-    rm -rf $scriptDir/$imageDirectory/val
+    cp -r $scriptDir/$imageDirectory $scriptDir/${imageDirectory}_trial$i
+    ${scriptDir}/makeDataForExperiments.sh $scriptDir/${imageDirectory}_trial$i
 done
