@@ -12,10 +12,18 @@ origDir=$(pwd)
 cd $scriptDir/..
 
 #make the output file
-output_file=$scriptDir/output/${outputName}.csv
-rm -f $output_file
-touch $output_file
-echo "data_dir,num_labeled,best_val_acc" > $output_file
+output_file_augmented=$scriptDir/output/${outputName}_augmented.csv
+output_file_noprob=$scriptDir/output/${outputName}_noprob.csv
+output_file_notaugmented=$scriptDir/output/${outputName}_notaugmented.csv
+rm -f $output_file_augmented
+rm -f $output_file_noprob
+rm -f $output_file_notaugmented
+touch $output_file_augmented
+touch $output_file_noprob
+touch $output_file_notaugmented
+echo "data_dir,num_labeled,augmented_best_val_acc" > $output_file_augmented
+echo "data_dir,num_labeled,augmented_noprob_best_val_acc" > $output_file_noprob
+echo "data_dir,num_labeled,notaugmented_best_val_acc" > $output_file_notaugmented
 
 model_output_folder=$scriptDir/${outputName}Models
 rm -rf $model_output_folder
@@ -23,9 +31,15 @@ mkdir -p $model_output_folder
 
 for n in "${numImages[@]}"
 do
-    python -m uncertain.learn $imagesParent/augmented_${n}/ $n $output_file $model_output_folder
-    python -m uncertain.learn $imagesParent/augmented_${n}_noprob/ $n $output_file $model_output_folder
-    python -m uncertain.learn $imagesParent/not_augmented_${n}/ $n $output_file $model_output_folder
+    echo "Running for experiments $n"
+    num_t1=$(ls -1 $imagesParent/augmented_${n}_noprob/train/1.0,0.0/ | wc -l)
+    num_t0=$(ls -1 $imagesParent/augmented_${n}_noprob/train/0.0,1.0/ | wc -l)
+    num_total=${num_t1}_${num_t0}
+    num_training=$(expr 2 \* $n)
+    num_str=${num_training}_${num_total}
+    python -m uncertain.learn $imagesParent/augmented_${n}/ $num_str $output_file_augmented $model_output_folder
+    python -m uncertain.learn $imagesParent/augmented_${n}_noprob/ $num_str $output_file_noprob $model_output_folder
+    python -m uncertain.learn $imagesParent/not_augmented_${n}/ $num_str $output_file_notaugmented $model_output_folder
 done
 
 cd $origDir
