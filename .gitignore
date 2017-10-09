@@ -14,3 +14,6 @@ log.txt*
 *.csv
 output/
 downloadImagenet.sh
+IMAGENET_API_KEY
+entertainerOrCandidate
+*.log
