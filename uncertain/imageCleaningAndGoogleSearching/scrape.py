@@ -30,6 +30,8 @@ with Browser() as browser:
         # upload a file
         browser.attach_file("encoded_image", join(dirToDownload, imgFileName))
         time.sleep(0.5)
+        while browser.find_by_id("qbupm"):
+            time.sleep(0.5)
         visSimLink = browser.find_by_text("Visually similar images")
         if len(visSimLink) == 0:
             continue
