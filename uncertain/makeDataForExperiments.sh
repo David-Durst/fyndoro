@@ -65,10 +65,9 @@ do
     for c in "${categoryGroups[@]}"
     do
         mkdir -p $subsetImages/train/$c
-        mkdir -p $subsetImages/val/$c
         # keep same validation images for every run
         shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
-        ln -s $images/val/$c/ $subsetImages/val/$c/
+        ln -sr $images/val/$c/ $subsetImages/val/$c/
         if [ $c == "1.0,0.0" ]
         then
             rm -rf $subsetImages/train/0.8,0.2/

@@ -11,7 +11,7 @@ for i in $(seq $numTrials)
 do
     trialLocation=$scriptDir/${imageDirectory}_trial$i
     mkdir $trialLocation
-    ln -s $scriptDir/${imageDirectory}/1.0,0.0 $trialLocation/1.0,0.0
-    ln -s $scriptDir/${imageDirectory}/0.0,1.0 $trialLocation/0.0,1.0
+    ln -sr $scriptDir/${imageDirectory}/1.0,0.0 $trialLocation/1.0,0.0
+    ln -sr $scriptDir/${imageDirectory}/0.0,1.0 $trialLocation/0.0,1.0
     ${scriptDir}/makeDataForExperiments.sh $scriptDir/${imageDirectory}_trial$i
 done
