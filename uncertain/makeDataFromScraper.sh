@@ -12,6 +12,9 @@ destinationServer=$2
 numTrials=3
 for i in $(seq $numTrials)
 do
-    cp -r $scriptDir/$imageDirectory $scriptDir/${imageDirectory}_trial$i
+    trialLocation=$scriptDir/${imageDirectory}_trial$i
+    mkdir $trialLocation
+    ln -s $scriptDir/${imageDirectory}/1.0,0.0 $trialLocation/1.0,0.0
+    ln -s $scriptDir/${imageDirectory}/0.0,1.0 $trialLocation/0.0,1.0
     ${scriptDir}/makeDataForExperiments.sh $scriptDir/${imageDirectory}_trial$i
 done
