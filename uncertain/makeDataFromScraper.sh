@@ -6,9 +6,6 @@ scriptDir=$(dirname "$(readlink -f "$0")")
 # in the first class from imagenet, and 0.0,1.0 for the images in the
 # second class
 imageDirectory=$1
-# second argument is where to rsync the data to, like durst@dawn4:path/to/put/in
-# path will have trial number appended to it
-destinationServer=$2
 numTrials=3
 for i in $(seq $numTrials)
 do
