@@ -52,19 +52,27 @@ with Browser() as browser:
             if numDownloaded > imagesToDownloadPerImage:
                 break
             numDownloaded += 1
-            browser.visit(image)
-            time.sleep(0.1)
-            if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
-                print("skipping image " + str(numDownloaded - 1), flush=True)
+            try:
+                browser.visit(image)
+                time.sleep(0.1)
+                if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
+                    print("skipping image " + str(numDownloaded - 1), flush=True)
+                    print(browser.html, flush=True)
+                    continue
+                else:
+                    print("downloading image " + str(numDownloaded - 1), flush=True)
+                imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
+                print("timeout 30 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir, flush=True)
+                process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
+                #processList.append(process)
+                process.wait()
+            except Exception as e:
+                print("Caught exception", flush=True)
+                print(e, flush=True)
+                print("Browser data", flush=True)
+                print(browser.url, flush=True)
                 print(browser.html, flush=True)
-                continue
-            else:
-                print("downloading image " + str(numDownloaded - 1), flush=True)
-            imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
-            print("timeout 30 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir, flush=True)
-            process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
-            #processList.append(process)
-            process.wait()
+
 
 
         for process in processList:
