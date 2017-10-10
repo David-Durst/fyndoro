@@ -31,30 +31,40 @@ with Browser() as browser:
         browser.attach_file("encoded_image", join(dirToDownload, imgFileName))
         time.sleep(0.5)
         while browser.find_by_id("qbupm"):
+            print("stalling for image", flush=True)
             time.sleep(0.5)
         visSimLink = browser.find_by_text("Visually similar images")
         if len(visSimLink) == 0:
+            print("didn't find vissim", flush=True)
+            print(browser.url, flush=True)
+            print(browser.html, flush=True)
             continue
         visSimLink.click()
         time.sleep(0.5)
         images = [x['href'] for x in browser.find_by_css(".rg_l")]
         numDownloaded = 0
 
-        print("images to download " + str(len(images)))
-        print(imgFileName)
+        print("images to download " + str(len(images)), flush=True)
+        print(imgFileName, flush=True)
         processList = []
 
         for image in images:
             if numDownloaded > imagesToDownloadPerImage:
                 break
+            numDownloaded += 1
             browser.visit(image)
             time.sleep(0.1)
             if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
+                print("skipping image " + str(numDownloaded - 1), flush=True)
+                print(browser.html, flush=True)
                 continue
+            else:
+                print("downloading image " + str(numDownloaded - 1), flush=True)
             imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
-            process = subprocess.Popen("timeout 15 python " + scriptDir + "/scrapeDLSubprocess.py " + imgToDownload + " " + outputDir, shell=True)
-            processList.append(process)
-            numDownloaded += 1
+            print("timeout 30 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir, flush=True)
+            process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
+            #processList.append(process)
+            process.wait()
 
 
         for process in processList:
