@@ -69,8 +69,8 @@ with Browser() as browser:
                     continue
                 print("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", flush=True)
                 process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
-                #processList.append(process)
-                process.wait()
+                processList.append(process)
+                #process.wait()
             except Exception as e:
                 print("Caught exception", flush=True)
                 print(e, flush=True)
@@ -82,8 +82,8 @@ with Browser() as browser:
                 print(browser.url, flush=True)
 
 
-        #for process in processList:
-        #    process.wait(30)
+        for process in processList:
+            process.wait()
 
         #end_time = time.time()
         #if end_time > start_time + wait_time:
