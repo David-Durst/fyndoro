@@ -20,7 +20,7 @@ imageFiles = [f for f in os.listdir(dirToDownload) if isfile(join(dirToDownload,
 
 with Browser() as browser:
     # only wait on pages for 30 seconds, not 15 minutes
-    browser.driver.set_page_load_timeout(30000)
+    browser.driver.set_page_load_timeout(30)
     for imgFileName in imageFiles:
         browser.visit("https://images.google.com/")
         #start_time = time.time()
