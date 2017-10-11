@@ -19,6 +19,8 @@ imageFiles = [f for f in os.listdir(dirToDownload) if isfile(join(dirToDownload,
 
 
 with Browser() as browser:
+    # only wait on pages for 30 seconds, not 15 minutes
+    browser.driver.set_page_load_timeout(30000)
     for imgFileName in imageFiles:
         browser.visit("https://images.google.com/")
         #start_time = time.time()
@@ -67,8 +69,8 @@ with Browser() as browser:
                     continue
                 print("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", flush=True)
                 process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
-                processList.append(process)
-                #process.wait()
+                #processList.append(process)
+                process.wait()
             except Exception as e:
                 print("Caught exception", flush=True)
                 print(e, flush=True)
@@ -80,8 +82,8 @@ with Browser() as browser:
                 print(browser.url, flush=True)
 
 
-        for process in processList:
-            process.wait()
+        #for process in processList:
+        #    process.wait(30)
 
         #end_time = time.time()
         #if end_time > start_time + wait_time:
