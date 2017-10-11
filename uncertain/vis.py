@@ -1,14 +1,24 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
 
-f1 = pd.read_csv("rocketOrPPlant.csv")
-f2 = pd.read_csv("rocketOrPPlantSmall.csv")
-joined = pd.concat([f1, f2])
-joined['numLabled'] = joined['data_dir'].str.extract('augmented_(\d+)')
-joined['not_augmented'] = joined['data_dir'].str.contains('not_augmented')
-joined['noprob'] = joined['data_dir'].str.contains('noprob')
-noprob = joined[joined['noprob'] == True]
-notaugmented = joined[joined['not_augmented'] == True]
-augmentedWithProb = joined[(joined['noprob'] == False) & (joined['not_augmented'] == False)]
+numTrials = 3
+# the paths to the different trials, should be able to append a number ot the
+# end of each path to get the folder
+pathToTrialsData = sys.argv[1]
+outputName = sys.argv[2]
+# a list of the run
+runTypes = ["_augmented.csv", "_noprob.csv", "_notaugmented.csv"]
 
-plt.figure();
+allDFs = [[pd.read_csv(pathToTrialsData + str(outputName) + runTypes) for y in runTypes] for x in numTrials]
+
+trialIdx = 0
+for dfsForTrial in allDFs:
+    trialIdx += 1
+    plt.figure()
+    for i in range(numTrials):
+        if i == 0:
+            ax = dfsForTrial[i].plot(x=1, y=2, kind="bar")
+        else:
+            dfsForTrial[i].plot(x=1, y=2, kind="bar", ax=ax)
+    plt.savefig(pathToTrialsData + str(outputName) + "vis_trial" + str(trialIdx))

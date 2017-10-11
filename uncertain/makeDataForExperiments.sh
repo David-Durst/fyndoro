@@ -31,9 +31,13 @@ if [ $createTrainVal == true ] ; then
         mkdir -p $images/train/$c
         mkdir -p $images/val/$c
         # put all images for use in train first, then mv a subset of them to val
+        set +x
         shuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
+        set -x
         python $scriptDir/imageCleaningAndGoogleSearching/clean.py $images/train/$c
+        set +x
         shuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
+        set -x
     done
 fi
 
@@ -66,7 +70,9 @@ do
     do
         mkdir -p $subsetImages/train/$c
         # keep same validation images for every run
+        set +x
         shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $subsetImages/train/$c/
+        set -x
         ln -sr $images/val/$c $subsetImages/val/$c
         if [ $c == "1.0,0.0" ]
         then
