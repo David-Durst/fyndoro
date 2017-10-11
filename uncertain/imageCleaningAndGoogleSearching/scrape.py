@@ -71,7 +71,7 @@ with Browser() as browser:
                 print(e, flush=True)
                 try:
                     browser.get_alert().dismiss()
-                except Exception as e:
+                except Exception:
                     print("Exception not alert", flush=True)
                 print("Browser data", flush=True)
                 print(browser.url, flush=True)
