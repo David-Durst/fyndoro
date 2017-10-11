@@ -69,6 +69,10 @@ with Browser() as browser:
             except Exception as e:
                 print("Caught exception", flush=True)
                 print(e, flush=True)
+                try:
+                    browser.get_alert().dismiss()
+                except Exception as e:
+                    print("Exception not alert", flush=True)
                 print("Browser data", flush=True)
                 print(browser.url, flush=True)
                 print(browser.html, flush=True)
