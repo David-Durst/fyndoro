@@ -62,10 +62,10 @@ with Browser() as browser:
                 else:
                     print("downloading image " + str(numDownloaded - 1), flush=True)
                 imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
-                print("timeout 30 python \"" + scriptDir + "/scrapeDLSubprocess.py\" \"" + imgToDownload + "\" " + outputDir, flush=True)
+                print("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", flush=True)
                 process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
-                #processList.append(process)
-                process.wait()
+                processList.append(process)
+                #process.wait()
             except Exception as e:
                 print("Caught exception", flush=True)
                 print(e, flush=True)
