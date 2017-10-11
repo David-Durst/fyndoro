@@ -62,6 +62,9 @@ with Browser() as browser:
                 else:
                     print("downloading image " + str(numDownloaded - 1), flush=True)
                 imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
+                if imgToDownload is None:
+                    print("website does redirect, imgToDownload is None")
+                    continue
                 print("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", flush=True)
                 process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
                 processList.append(process)
@@ -75,8 +78,6 @@ with Browser() as browser:
                     print("Exception not alert", flush=True)
                 print("Browser data", flush=True)
                 print(browser.url, flush=True)
-                print(browser.html, flush=True)
-
 
 
         for process in processList:
