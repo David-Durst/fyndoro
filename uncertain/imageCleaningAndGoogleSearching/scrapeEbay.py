@@ -40,7 +40,8 @@ with Browser() as browser:
         numDownloaded += 1
         try:
             browser.visit(listing)
-            browser.find_by_id("icImg").click()
+            browser.find_by_id("linkMainImg").click()
+            browser.find_by_id("vi_zoom_trigger_mask").click()
             time.sleep(0.2)
             print("downloading image for " + listing, flush=True)
             imgToDownload = browser.find_by_id("viEnlargeImgLayer_img_ctr")['src']
