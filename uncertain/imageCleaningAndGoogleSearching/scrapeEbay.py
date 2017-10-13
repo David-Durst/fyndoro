@@ -45,8 +45,9 @@ with Browser() as browser:
             time.sleep(0.2)
             print("downloading image for " + listing, flush=True)
             imgToDownload = browser.find_by_id("viEnlargeImgLayer_img_ctr")['src']
-            print("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", flush=True)
-            process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
+            processStr = "timeout 30 wget -t 3 -O " + outputDir + "/" + str(numDownloaded) + ".jpg \"" + imgToDownload + "\""
+            print(processStr, flush=True)
+            process = subprocess.Popen(processStr, shell=True)
             processList.append(process)
             #process.wait()
         except Exception as e:
