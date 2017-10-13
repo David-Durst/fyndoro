@@ -20,7 +20,26 @@ for dfsForTrial in allDFs:
         columns = dfsForTrial[i].columns
         if i == 0:
             ax = dfsForTrial[i].plot(x=columns[1], y=columns[2])
-            plt.title(outputName + " trial " + str(trialIdx))
+            plt.title(outputName + str(trialIdx))
         else:
             dfsForTrial[i].plot(x=columns[1], y=columns[2], ax=ax)
-    plt.savefig(pathToTrialsData + str(outputName) + "vis_trial" + str(trialIdx))
+    plt.savefig(pathToTrialsData + "vis_trial" + str(trialIdx))
+
+# acerage the dataframes across all trials
+averagedDFs = []
+plt.figure()
+for i in range(len(runTypes)):
+    runType = runTypes[i]
+    for j in range(len(numTrials)):
+        if j == 0:
+            avgCol = allDFs[j][i][allDFs[j][i].columns[2]] / 3
+        else:
+            avgCol += allDFs[j][i][allDFs[j][i].columns[2]] / 3
+    plottingColumns = allDFs[0][i].columns[1:3]
+    dfToPlot = pd.concat([allDFs[0][i][allDFs[0][i].columns[1]],avgCol], axis=1, keys=plottingColumns)
+    if i == 0:
+        ax = dfToPlot.plot(x=plottingColumns[0], y=plottingColumns[1])
+        plt.title(outputName + str("avg"))
+    else:
+        dfToPlot.plot(x=plottingColumns[0], y=plottingColumns[1], ax=ax)
+plt.savefig(pathToTrialsData + "vis_avg")
