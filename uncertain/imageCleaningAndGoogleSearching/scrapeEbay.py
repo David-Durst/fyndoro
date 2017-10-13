@@ -24,8 +24,9 @@ with Browser() as browser:
     # search for the query
     browser.find_by_css("#gh-ac").fill(queryToDownload)
     browser.find_by_css("#gh-btn").click()
-    # get 200 results
-    browser.find_by_css(".dropdown-toggle")[2].click()
+    # get 200 results if possible
+    if len(browser.find_by_css(".dropdown-toggle")) >= 2:
+        browser.find_by_css(".dropdown-toggle")[2].click()
     browser.find_by_css(".ipp")[3].click()
     time.sleep(0.5)
     listingPages = [x['href'] for x in browser.find_by_css(".vip")]
