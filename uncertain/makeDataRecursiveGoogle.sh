@@ -70,7 +70,7 @@ do
         for j in $(seq $numIterations)
         do
             curIterDir=$subsetImages/$j/train/$c
-            nextIterDir=$subsetImages/$(expr $j + 1)/train/$c_
+            nextIterDir=$subsetImages/$(expr $j + 1)/train/$c
             uptoCurDir=$subsetImages/upto_$j/train/$c
             uptoNextIterDir=$subsetImages/upto_$(expr $j + 1)/train/$c
             mkdir -p $curIterDir
@@ -79,7 +79,7 @@ do
             # keep same validation images for every run
             # only need to make val for cur dir if this is first iteration, other curs will be made by prev iteration
             curIterValDir=$subsetImages/$j/val/$c
-            nextIterValDir=$subsetImages/$(expr $j + 1)/val/$c_
+            nextIterValDir=$subsetImages/$(expr $j + 1)/val/$c
             uptoCurValDir=$subsetImages/upto_$j/val/$c
             uptoNextIterValDir=$subsetImages/upto_$(expr $j + 1)/val/$c
             if [ $j == 1 ]
