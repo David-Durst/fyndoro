@@ -116,18 +116,15 @@ do
     # join this with previous subsets to create training and validation runs of increasing size
     # this means that subset 1 leads to a merged subset of 25, subset 2 joins with subset 1 to make a merged subset of 50
     sumIncrementsSoFar=$(expr $sumIncrementsSoFar + ${trainIncrements[$idx]})
-    mergedSubset=$images/augmented_${sumIncrementsSoFar}
-    for j in $(seq $numIterations)
-    do
-        rm -rf $mergedSubset
-        mkdir -p $mergedSubset
-        cp -r $subsetImages/* $mergedSubset
-        rm -rf $subsetImages
-        if [ $i -gt 1 ]
-        then
-            cp -r $previousMergedSubset/* $mergedSubset
-        fi
-    done
+    mergedSubset=$images/merged_${sumIncrementsSoFar}
+    rm -rf $mergedSubset
+    mkdir -p $mergedSubset
+    cp -r $subsetImages/* $mergedSubset
+    rm -rf $subsetImages
+    if [ $i -gt 1 ]
+    then
+        cp -r $previousMergedSubset/* $mergedSubset
+    fi
 
     echo "Number of images in " $mergedSubset
     # https://unix.stackexchange.com/questions/4105/how-do-i-count-all-the-files-recursively-through-directories
