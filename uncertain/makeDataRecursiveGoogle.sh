@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -x
+set -e
 # note, assume already have images into two folders, 1.0,0.0 and 0.0,1.0 for the two classes
 # the absolute location of the folder containing those directories is the input
 scriptDir=$(dirname "$(readlink -f "$0")")
@@ -8,9 +9,9 @@ createTrainVal=true
 createDatasets=true
 categoryGroups=("1.0,0.0" "0.0,1.0")
 numIterations=3
-trainImages=100
+trainImages=5
 # note that train increments need to sum to trainImages
-trainIncrements=(1 1 1 2 5 10 20 60)
+trainIncrements=(1 1 3)
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
 export MOZ_HEADLESS=1
@@ -78,17 +79,19 @@ do
             mkdir -p $nextIterDir
             # keep same validation images for every run
             # only need to make val for cur dir if this is first iteration, other curs will be made by prev iteration
-            curIterValDir=$subsetImages/$j/val/$c
-            nextIterValDir=$subsetImages/$(expr $j + 1)/val/$c
-            uptoCurValDir=$subsetImages/upto_$j/val/$c
-            uptoNextIterValDir=$subsetImages/upto_$(expr $j + 1)/val/$c
+            curIterValDir=$subsetImages/$j/val
+            nextIterValDir=$subsetImages/$(expr $j + 1)/val
+            uptoCurValDir=$subsetImages/upto_$j/val
+            uptoNextIterValDir=$subsetImages/upto_$(expr $j + 1)/val
             if [ $j == 1 ]
             then
                 mkdir -p $curIterValDir
+                ln -sr $images/val/$c $curIterValDir
                 mkdir -p $uptoCurValDir
                 ln -sr $images/val/$c $uptoCurValDir
             fi
             mkdir -p $nextIterValDir
+            ln -sr $images/val/$c $nextIterValDir
             mkdir -p $uptoNextIterValDir
             ln -sr $images/val/$c $uptoNextIterValDir
             # if first time scraping for this category group for this numIncrement
@@ -106,6 +109,7 @@ do
             # if first iter, make upToCurDir as no prev iteration to make it
             if [ $j == 1 ]
             then
+                mkdir -p $uptoCurDir
                 cp -r $curIterDir/* $uptoCurDir/
             fi
             cp -r $nextIterDir/* $uptoNextIterDir/
