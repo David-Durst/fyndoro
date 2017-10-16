@@ -6,7 +6,7 @@ outputName=$2
 scriptDir=$(dirname "$(readlink -f "$0")")
 numImages=(1 2 5)
 numIterations=4
-$scriptDir/makeDataForExperiments.sh $imagesParent
+#$scriptDir/makeDataForExperiments.sh $imagesParent
 
 #get in directory above script for running uncertain.learn correctly
 origDir=$(pwd)
