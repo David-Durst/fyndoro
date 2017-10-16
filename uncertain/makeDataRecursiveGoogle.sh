@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -x
-set -e
 # note, assume already have images into two folders, 1.0,0.0 and 0.0,1.0 for the two classes
 # the absolute location of the folder containing those directories is the input
 scriptDir=$(dirname "$(readlink -f "$0")")

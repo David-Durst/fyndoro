@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sys
 
-numTrials = [1, 2, 3]
+numTrials = ['']
 # the paths to the different trials, should be able to append a number ot the
 # end of each path to get the folder
 pathToTrialsData = sys.argv[1]
@@ -16,7 +16,7 @@ trialIdx = 0
 for dfsForTrial in allDFs:
     trialIdx += 1
     plt.figure()
-    for i in range(len(numTrials)):
+    for i in range(len(runTypes)):
         columns = dfsForTrial[i].columns
         if i == 0:
             ax = dfsForTrial[i].plot(x=columns[1], y=columns[2])
