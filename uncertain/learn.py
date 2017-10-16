@@ -20,7 +20,7 @@ import os
 data_dir = sys.argv[1]
 num_training_str = sys.argv[2]
 output_file = sys.argv[3]
-model_output_dir = sys.argv[4]
+#model_output_dir = sys.argv[4]
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -164,4 +164,4 @@ model_ft, best_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_sched
 with open(output_file, 'a') as f:
     f.write(data_dir + "," + num_training_str + "," + str(best_acc) + "\n")
 
-torch.save(model_ft.state_dict(), model_output_dir + "/" + num_training_str)
+#torch.save(model_ft.state_dict(), model_output_dir + "/" + num_training_str)
