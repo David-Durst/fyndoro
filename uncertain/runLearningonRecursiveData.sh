@@ -14,7 +14,7 @@ cd $scriptDir/..
 
 #make the output files
 outputFiles=()
-for i in $(seq numIterations)
+for i in $(seq $numIterations)
 do
     outputFiles[$i]=$scriptDir/output/${outputName}_iter${i}.csv
     rm -f ${outputFiles[$i]}
@@ -29,7 +29,7 @@ mkdir -p $model_output_folder
 for n in "${numImages[@]}"
 do
     echo "Running experiments for merged_$n"
-    for i in $(seq numIterations)
+    for i in $(seq $numIterations)
     do
         num_t1=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/1.0,0.0/ | wc -l)
         num_t0=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/0.0,1.0/ | wc -l)
