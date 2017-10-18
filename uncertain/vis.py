@@ -8,9 +8,9 @@ numTrials = ['']
 pathToTrialsData = sys.argv[1]
 outputName = sys.argv[2]
 # a list of the run
-runTypes = ["_augmented.csv", "_noprob.csv", "_notaugmented.csv"]
+runTypes = ["1", "2", "3", "4"]
 
-allDFs = [[pd.read_csv(pathToTrialsData + str(x) + y) for y in runTypes] for x in numTrials]
+allDFs = [[pd.read_csv(pathToTrialsData + str(x) + y + ".csv") for y in runTypes] for x in numTrials]
 
 trialIdx = 0
 for dfsForTrial in allDFs:
@@ -25,6 +25,7 @@ for dfsForTrial in allDFs:
             dfsForTrial[i].plot(x=columns[1], y=columns[2], ax=ax)
     plt.savefig(pathToTrialsData + "vis_trial" + str(trialIdx))
 
+exit
 # acerage the dataframes across all trials
 averagedDFs = []
 plt.figure()
