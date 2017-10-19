@@ -11,7 +11,7 @@ from torchvision import datasets, models, transforms
 import torch.nn.functional as F
 import sys
 import os
-import pprint
+import json
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
@@ -55,7 +55,7 @@ for phase in ['train', 'val']:
     print("In phase " + phase)
     phaseLen = str(len(dsets[phase]))
     i = 0
-    outputs[phase] = {}
+    outputs[phase] = []
     for data in dsets[phase]:
         print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
         inputs, labelIndices = data
@@ -71,8 +71,9 @@ for phase in ['train', 'val']:
             result = result.cpu().numpy()[0].tolist()
         else:
             result = result.numpy()[0].tolist()
-        outputs[phase][dsets[phase].imgs[i][0]] = result
+        result.insert(0, dsets[phase].imgs[i][0])
+        outputs[phase].append(result)
         i += 1
 
 with open(output_file, 'w') as f:
-    pprint.pprint(outputs, stream=f, compact=False)
+    json.dump(outputs, f, sort_keys=True, indent=2, separators=(',', ': '))
