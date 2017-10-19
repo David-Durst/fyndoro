@@ -18,9 +18,8 @@ import os
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
-num_training_str = sys.argv[2]
+model_input_location = sys.argv[2]
 output_file = sys.argv[3]
-model_output_dir = sys.argv[4]
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -42,13 +41,41 @@ data_transforms = {
 dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
          for x in ['train', 'val']}
 
+use_gpu = torch.cuda.is_available()
+
+model = models.resnet18(pretrained=True)
+for param in model.parameters():
+    param.requires_grad = False
+num_ftrs = model.fc.in_features
+model.fc = nn.LogSoftmax(num_ftrs, 2)
+model.load_state_dict(torch.load(model_input_location))
+
+if use_gpu:
+    model = model.cuda()
+
+for phase in ['train', 'val']:
+    print("In phase " + phase)
+    phaseLen = str(len(dsets[phase]))
+    i = 0
+    for data in dsets[phase]:
+        i += 1
+        print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
+        inputs, labelIndices = data
+        inputs = inputs.unsqueeze(0)
+        # wrap them in Variable
+        if use_gpu:
+            inputs = Variable(inputs.cuda())
+        else:
+            inputs = Variable(inputs)
+        # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
+        outputs = model(inputs)
+
 dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
                                                shuffle=True, num_workers=4)
                 for x in ['train', 'val']}
 dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
 dset_classes = dsets['train'].classes
 
-use_gpu = torch.cuda.is_available()
 
 # Get a batch of training data
 inputs, classes = next(iter(dset_loaders['train']))
@@ -146,19 +173,8 @@ def exp_lr_scheduler(optimizer, epoch, init_lr=0.001, lr_decay_epoch=7):
 
     return optimizer
 
-model_ft = models.resnet18(pretrained=True)
-for param in model_ft.parameters():
-    param.requires_grad = False
-num_ftrs = model_ft.fc.in_features
-model_ft.fc = nn.Softmax(num_ftrs, 2)
-
-if use_gpu:
-    model_ft = model_ft.cuda()
 
 criterion = UncertainCrossEntropyLoss()
-
-# Observe that all parameters are being optimized
-optimizer_ft = optim.SGD(model_ft.fc.parameters(), lr=0.001, momentum=0.9)
 
 model_ft, best_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
