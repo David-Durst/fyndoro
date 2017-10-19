@@ -66,7 +66,12 @@ for phase in ['train', 'val']:
         else:
             inputs = Variable(inputs)
         # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
-        outputs[phase][dsets[phase].imgs[i][0]] = F.softmax(model(inputs))
+        result = F.softmax(model(inputs)).data
+        if use_gpu:
+            result = result.cpu().numpy()
+        else:
+            result = result.numpy()
+        outputs[phase][dsets[phase].imgs[i][0]] = result
         i += 1
 
 with open(output_file, 'a') as f:
