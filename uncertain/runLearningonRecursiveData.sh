@@ -36,7 +36,7 @@ do
         num_total=${num_t1}_${num_t0}
         num_training=$(expr 2 \* $n)
         num_str=${num_training}_${num_total}
-        python -m uncertain.learn $imagesParent/merged_${n}/upto_${i} $num_str ${outputFiles[$i]}
+        python -m uncertain.learn $imagesParent/merged_${n}/upto_${i} $num_str ${outputFiles[$i]} $model_output_folder
      done
 done
 
