@@ -74,5 +74,5 @@ for phase in ['train', 'val']:
         outputs[phase][dsets[phase].imgs[i][0]] = result
         i += 1
 
-with open(output_file, 'a') as f:
+with open(output_file, 'w') as f:
     pprint.pprint(outputs, stream=f, compact=False)
