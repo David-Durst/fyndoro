@@ -12,7 +12,6 @@ import torch.nn.functional as F
 import sys
 import os
 import pprint
-import json
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
@@ -75,5 +74,5 @@ for phase in ['train', 'val']:
         outputs[phase][dsets[phase].imgs[i][0]] = result
         i += 1
 
-with open(output_file, 'w') as f:
-    json.dump(outputs, f)
+with open(output_file, 'a') as f:
+    pprint.pprint(outputs, stream=f)
