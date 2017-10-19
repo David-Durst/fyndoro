@@ -50,12 +50,12 @@ model.load_state_dict(torch.load(model_input_location))
 if use_gpu:
     model = model.cuda()
 
-outputs = []
+outputs = {}
 for phase in ['train', 'val']:
     print("In phase " + phase)
     phaseLen = str(len(dsets[phase]))
     i = 0
-    outputs[phase] = []
+    outputs[phase] = {}
     for data in dsets[phase]:
         print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
         inputs, labelIndices = data
