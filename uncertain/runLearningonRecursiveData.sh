@@ -22,9 +22,11 @@ do
     echo "data_dir,num_labeled,${i}_best_val_acc" > ${outputFiles[$i]}
 done
 
-model_output_folder=$scriptDir/${outputName}Models
-rm -rf $model_output_folder
-mkdir -p $model_output_folder
+for i in $(seq $numIterations)
+    model_output_folder=$scriptDir/${outputName}Models_${i}
+    rm -rf $model_output_folder
+    mkdir -p $model_output_folder
+done
 
 for n in "${numImages[@]}"
 do
