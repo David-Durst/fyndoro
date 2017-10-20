@@ -27,28 +27,28 @@ def certainRightAndWrong(valAndTrain):
         dset = valAndTrain[type]
         certain = dset[(dset[1] > 0.90) | (dset[1] < 0.1)]
 
-        destDirRightCat1 = " mOrFRecNoFreezeModels/certainPics/right/1.0,0.0/" + type + "/"
+        destDirRightCat1 = " mOrFRecNoFreezeModels/certainPics/" + type + "/1.0,0.0/right/"
         os.system("mkdir -p " + destDirRightCat1)
         certainRightCat1 = certain[(dset[1] > 0.9) & (dset[0].str.contains("1.0,0.0"))][0].tolist()[:100]
         for fname in certainRightCat1:
             os.system(
                 "cp " + fname + destDirRightCat1 + os.path.basename(fname))
 
-        destDirRightCat2 = " mOrFRecNoFreezeModels/certainPics/right/0.0,1.0/" + type + "/"
+        destDirRightCat2 = " mOrFRecNoFreezeModels/certainPics/" + type + "/0.0,1.0/right/"
         os.system("mkdir -p " + destDirRightCat2)
         certainRightCat2 = certain[(dset[2] > 0.9) & (dset[0].str.contains("0.0,1.0"))][0].tolist()[:100]
         for fname in certainRightCat2:
             os.system(
                 "cp " + fname + destDirRightCat2 + os.path.basename(fname))
 
-        destDirWrongCat1 = " mOrFRecNoFreezeModels/certainPics/wrong/1.0,0.0/" + type + "/"
+        destDirWrongCat1 = " mOrFRecNoFreezeModels/certainPics/" + type + "/1.0,0.0/wrong/"
         os.system("mkdir -p " + destDirWrongCat1)
         certainWrongCat1 = certain[(dset[1] < 0.1) & (dset[0].str.contains("1.0,0.0"))][0].tolist()[:100]
         for fname in certainWrongCat1:
             os.system(
                 "cp " + fname + destDirWrongCat1 + os.path.basename(fname))
 
-        destDirWrongCat2 = " mOrFRecNoFreezeModels/certainPics/wrong/0.0,1.0/" + type + "/"
+        destDirWrongCat2 = " mOrFRecNoFreezeModels/certainPics/" + type + "/0.0,1.0/wrong/"
         os.system("mkdir -p " + destDirWrongCat2)
         certainWrongCat2 = certain[(dset[2] < 0.1) & (dset[0].str.contains("0.0,1.0"))][0].tolist()[:100]
         for fname in certainWrongCat2:
