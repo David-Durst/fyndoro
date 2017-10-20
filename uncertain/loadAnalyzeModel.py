@@ -37,9 +37,9 @@ def certainWrong(valAndTrain):
     val = valAndTrain["val"]
     valUncertain = val[val[1] > 0.90][0].tolist()
     for fName in valUncertain:
-        os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/right/val/" + os.path.basename(fName))
+        os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/wrong/val/" + os.path.basename(fName))
 
     train = valAndTrain["train"]
     trainUncertain = train[train[2] > 0.90][0].tolist()
     for fName in trainUncertain:
-        os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/right/train/" + os.path.basename(fName))
+        os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/wrong/train/" + os.path.basename(fName))
