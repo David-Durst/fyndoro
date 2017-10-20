@@ -24,22 +24,22 @@ def uncertain(valAndTrain):
 
 def certainRight(valAndTrain):
     val = valAndTrain["val"]
-    valUncertain = val[val[2] > 0.90][0].tolist()
+    valUncertain = val[val[2] > 0.90][0].tolist()[:100]
     for fName in valUncertain:
         os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/right/val/" + os.path.basename(fName))
 
     train = valAndTrain["train"]
-    trainUncertain = train[train[1] > 0.90][0].tolist()
+    trainUncertain = train[train[1] > 0.90][0].tolist()[:100]
     for fName in trainUncertain:
         os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/right/train/" + os.path.basename(fName))
 
 def certainWrong(valAndTrain):
     val = valAndTrain["val"]
-    valUncertain = val[val[1] > 0.90][0].tolist()
+    valUncertain = val[val[1] > 0.90][0].tolist()[:100]
     for fName in valUncertain:
         os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/wrong/val/" + os.path.basename(fName))
 
     train = valAndTrain["train"]
-    trainUncertain = train[train[2] > 0.90][0].tolist()
+    trainUncertain = train[train[2] > 0.90][0].tolist()[:100]
     for fName in trainUncertain:
         os.system("cp " + fName + " mOrFRecNoFreezeModels/certainPics/wrong/train/" + os.path.basename(fName))
