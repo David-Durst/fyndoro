@@ -23,6 +23,7 @@ do
 done
 
 for i in $(seq $numIterations)
+do
     model_output_folder=$scriptDir/${outputName}Models_${i}
     rm -rf $model_output_folder
     mkdir -p $model_output_folder
