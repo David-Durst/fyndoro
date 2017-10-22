@@ -121,15 +121,16 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
 
-            print('{:.7f}: sum of abs of difference in weights'.format(
-                (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
-            final_layer_weights_last_iteration = model.fc.weight
-
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model = copy.deepcopy(model)
 
+        print("last layer weights:")
+        print(model.fc.weight)
+        print('{:.7f}: sum of abs of difference in weights'.format(
+            (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
+        final_layer_weights_last_iteration = model.fc.weight
         print()
 
     time_elapsed = time.time() - since
