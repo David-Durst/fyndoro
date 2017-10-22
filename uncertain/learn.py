@@ -130,7 +130,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
         print(model.fc.weight)
         print('{:.7f}: sum of abs of difference in weights'.format(
             (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
-        final_layer_weights_last_iteration = model.fc.weight
+        final_layer_weights_last_iteration = model.fc.weight.clone()
         print()
 
     time_elapsed = time.time() - since
