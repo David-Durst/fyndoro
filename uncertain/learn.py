@@ -65,7 +65,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
 
     best_model = model
     best_acc = 0.0
-    final_layer_weights_last_iteration = model.fc.weight
+    final_layer_weights_last_iteration = model.fc.weight.clone()
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
