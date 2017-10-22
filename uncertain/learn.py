@@ -121,7 +121,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
 
-            print('{.7f}: sum of abs of difference in weights'.format(
+            print('{:.7f}: sum of abs of difference in weights'.format(
                 (final_layer_weights_last_iteration - model.fc.weight).abs().sum()))
             final_layer_weights_last_iteration = model.fc.weight
 
