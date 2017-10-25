@@ -9,7 +9,6 @@ import torch.optim as optim
 from torch.autograd import Variable
 import torchvision
 from torchvision import datasets, models, transforms
-from torchsample.samplers import StratifiedSampler
 import numpy as np
 import time
 import copy
@@ -65,7 +64,7 @@ dset_loaders = {}
 dset_loaders['train'] = torch.utils.data.DataLoader(dsets['train'].imgs, batch_size=15, shuffle=False,
                                            sampler=sampler, num_workers=5, pin_memory=True)
 
-dset_loaders['val'] =  torch.utils.data.DataLoader(dsets['val'].imgs, batch_size=15, shuffle=True,
+dset_loaders['val'] = torch.utils.data.DataLoader(dsets['val'].imgs, batch_size=15, shuffle=True,
                                            num_workers=5, pin_memory=True)
 
 #dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=15,
@@ -81,7 +80,7 @@ use_gpu = torch.cuda.is_available()
 inputs, classes = next(iter(dset_loaders['train']))
 
 # Make a grid from batch
-out = torchvision.utils.make_grid(inputs)
+#out = torchvision.utils.make_grid(inputs)
 
 def classIndexToProbability(classIdx, class_to_idx_map):
     idx_to_class = {v: k for k, v in class_to_idx_map.items()}
