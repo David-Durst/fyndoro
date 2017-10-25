@@ -9,6 +9,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 import torchvision
 from torchvision import datasets, models, transforms
+from torchsample.samplers import StratifiedSampler
 import numpy as np
 import time
 import copy
@@ -42,9 +43,35 @@ data_transforms = {
 dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
          for x in ['train', 'val']}
 
-dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=4,
-                                               shuffle=True, num_workers=4)
-                for x in ['train', 'val']}
+#https://discuss.pytorch.org/t/balanced-sampling-between-classes-with-torchvision-dataloader/2703/3
+def make_weights_for_balanced_classes(images, nclasses):
+    count = [0] * nclasses
+    for item in images:
+        count[item[1]] += 1
+    weight_per_class = [0.] * nclasses
+    N = float(sum(count))
+    for i in range(nclasses):
+        weight_per_class[i] = N/float(count[i])
+    weight = [0] * len(images)
+    for idx, val in enumerate(images):
+        weight[idx] = weight_per_class[val[1]]
+    return weight
+
+weights = make_weights_for_balanced_classes(dsets['train'].imgs, len(dsets['train'].classes))
+weights = torch.DoubleTensor(weights)
+sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))
+
+dset_loaders = {}
+dset_loaders['train'] = torch.utils.data.DataLoader(dsets['train'].imgs, batch_size=15, shuffle=False,
+                                           sampler=sampler, num_workers=5, pin_memory=True)
+
+dset_loaders['val'] =  torch.utils.data.DataLoader(dsets['val'].imgs, batch_size=15, shuffle=True,
+                                           num_workers=5, pin_memory=True)
+
+#dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=15,
+#                                               shuffle=False, num_workers=4,
+#                                                sampler=StratifiedSampler)
+#                for x in ['train', 'val']}
 dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
 dset_classes = dsets['train'].classes
 
@@ -60,7 +87,7 @@ def classIndexToProbability(classIdx, class_to_idx_map):
     idx_to_class = {v: k for k, v in class_to_idx_map.items()}
     return [float(x) for x in idx_to_class[classIdx].split(",")]
 
-def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=25):
+def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=125):
     since = time.time()
 
     best_model = model
@@ -167,7 +194,7 @@ criterion = UncertainCrossEntropyLoss()
 optimizer_ft = optim.SGD(model_ft.fc.parameters(), lr=0.001, momentum=0.9)
 
 model_ft, best_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=25)
+                       num_epochs=125)
 
 with open(output_file, 'a') as f:
     f.write(data_dir + "," + num_training_str + "," + str(best_acc) + "\n")
