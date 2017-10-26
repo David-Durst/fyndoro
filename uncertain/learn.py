@@ -61,15 +61,14 @@ weights = torch.DoubleTensor(weights)
 sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))
 
 dset_loaders = {}
-dset_loaders['train'] = torch.utils.data.DataLoader(dsets['train'].imgs, batch_size=15, shuffle=False,
+dset_loaders['train'] = torch.utils.data.DataLoader(dsets['train'], batch_size=15, shuffle=False,
                                            sampler=sampler, num_workers=5, pin_memory=True)
 
-dset_loaders['val'] = torch.utils.data.DataLoader(dsets['val'].imgs, batch_size=15, shuffle=True,
+dset_loaders['val'] = torch.utils.data.DataLoader(dsets['val'], batch_size=15, shuffle=True,
                                            num_workers=5, pin_memory=True)
 
-#dset_loaders = {x: torch.utils.data.DataLoader(dsets[x], batch_size=15,
-#                                               shuffle=False, num_workers=4,
-#                                                sampler=StratifiedSampler)
+#dset_loaders2 = {x: torch.utils.data.DataLoader(dsets[x], batch_size=15,
+#                                               shuffle=False, num_workers=4)
 #                for x in ['train', 'val']}
 dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
 dset_classes = dsets['train'].classes
@@ -80,7 +79,7 @@ use_gpu = torch.cuda.is_available()
 inputs, classes = next(iter(dset_loaders['train']))
 
 # Make a grid from batch
-#out = torchvision.utils.make_grid(inputs)
+out = torchvision.utils.make_grid(inputs)
 
 def classIndexToProbability(classIdx, class_to_idx_map):
     idx_to_class = {v: k for k, v in class_to_idx_map.items()}
