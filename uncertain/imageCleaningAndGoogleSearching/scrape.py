@@ -8,8 +8,13 @@ import sys
 
 # first input is input directory to read from
 # second input is output directory
+# third, optional input is a string of inputs separated by spaces to filter scraped images based on
 dirToDownload = sys.argv[1]
 outputDir = sys.argv[2]
+if len(sys.argv == 4):
+    scrapeKeywords = sys.argv[3].lower().split(" ")
+else:
+    scrapeKeywords = False
 scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 imagesToDownloadPerImage=100
@@ -58,9 +63,23 @@ with Browser() as browser:
                 browser.visit(image)
                 time.sleep(0.1)
                 if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
-                    print("skipping image " + str(numDownloaded - 1), flush=True)
+                    print("skipping image " + str(numDownloaded - 1) + " as no View Image button", flush=True)
                     print(browser.html, flush=True)
                     continue
+                elif scrapeKeywords != False:
+                    noMatchingKeywords = True
+                    pageHTML = browser.html.lower()
+                    for keyword in scrapeKeywords:
+                        if pageHTML.find(keyword) > -1:
+                            noMatchingKeywords = False
+                            matchKeyword = keyword
+                            break
+                    if noMatchingKeywords:
+                        print("skipping image " + str(numDownloaded - 1) + " as matches no keywords in description", flush=True)
+                        print(browser.html, flush=True)
+                        continue
+                    else:
+                        print("downloading image " + str(numDownloaded - 1) + " that matches keyword " + matchKeyword, flush=True)
                 else:
                     print("downloading image " + str(numDownloaded - 1), flush=True)
                 imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
