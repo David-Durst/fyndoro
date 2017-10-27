@@ -42,6 +42,7 @@ data_transforms = {
 dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
          for x in ['train', 'val']}
 
+#https://discuss.pytorch.org/t/how-to-enable-the-dataloader-to-sample-from-each-class-with-equal-probability/911 - if i need stratified sampling
 #https://discuss.pytorch.org/t/balanced-sampling-between-classes-with-torchvision-dataloader/2703/3
 def make_weights_for_balanced_classes(images, nclasses):
     count = [0] * nclasses
