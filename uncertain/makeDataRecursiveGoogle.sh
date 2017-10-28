@@ -102,7 +102,7 @@ do
                 shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $curIterDir/
                 set -x
             fi
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ \"${keywordFilters[$c]}\"
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}"
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
             # join next iter images with all previous ones
             mkdir -p $uptoNextIterDir
