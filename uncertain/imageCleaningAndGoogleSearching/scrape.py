@@ -13,6 +13,9 @@ dirToDownload = sys.argv[1]
 outputDir = sys.argv[2]
 if len(sys.argv) == 4:
     scrapeKeywords = sys.argv[3].lower().split(" ")
+    print("scrapeKeywords are:")
+    for keyword in scrapeKeywords:
+        print(keyword)
 else:
     scrapeKeywords = False
 scriptDir = os.path.dirname(os.path.realpath(sys.argv[0]))
