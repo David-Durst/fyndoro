@@ -7,7 +7,7 @@ images=$1
 createTrainVal=true
 createDatasets=true
 categoryGroups=("scarletTanager" "summerTanager")
-keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")
+declare -A keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")
 numIterations=3
 trainImages=5
 # note that train increments need to sum to trainImages
@@ -102,7 +102,7 @@ do
                 shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $curIterDir/
                 set -x
             fi
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}"
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ \"${keywordFilters[$c]}\"
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
             # join next iter images with all previous ones
             mkdir -p $uptoNextIterDir
