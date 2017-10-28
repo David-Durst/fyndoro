@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -x
-# note, assume already have images into two folders, 1.0,0.0 and 0.0,1.0 for the two classes
+# note, assume already have images in two folders with names from categoryGroups variable for the two classes
 # the absolute location of the folder containing those directories is the input
 scriptDir=$(dirname "$(readlink -f "$0")")
 images=$1
 createTrainVal=true
 createDatasets=true
-categoryGroups=("1.0,0.0" "0.0,1.0")
+categoryGroups=("scarletTanager" "summerTanager")
+keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")}
 numIterations=3
 trainImages=5
 # note that train increments need to sum to trainImages
@@ -61,7 +62,7 @@ sumIncrementsSoFar=0
 for i in $(seq $numIncrements)
 do
     idx=$(expr $i - 1)
-    subsetImages=$images/subset_${i}_of_${trainIncrements[$idx]}_1.0,0.0_training_images
+    subsetImages=$images/subset_${i}_of_${trainIncrements[$idx]}_training_images
     # remove all old training and validation copies of data
     rm -rf $subsetImages
     mkdir -p $subsetImages
@@ -101,7 +102,7 @@ do
                 shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $curIterDir/
                 set -x
             fi
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ $scriptDir/../API_KEY
+            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ ${keywordFilters[$c]}
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
             # join next iter images with all previous ones
             mkdir -p $uptoNextIterDir

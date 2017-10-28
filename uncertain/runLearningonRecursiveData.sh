@@ -4,6 +4,7 @@
 imagesParent=$(readlink -f "$1")
 outputName=$2
 scriptDir=$(dirname "$(readlink -f "$0")")
+categoryGroups=("scarletTanager" "summerTanager")
 numImages=(1 2 5)
 numIterations=4
 #$scriptDir/makeDataForExperiments.sh $imagesParent
@@ -34,9 +35,9 @@ do
     echo "Running experiments for merged_$n"
     for i in $(seq $numIterations)
     do
-        num_t1=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/1.0,0.0/ | wc -l)
-        num_t0=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/0.0,1.0/ | wc -l)
-        num_total=${num_t1}_${num_t0}
+        num_t0=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/${categoryGroups[0]}/ | wc -l)
+        num_t1=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/${categoryGroups[1]}/ | wc -l)
+        num_total=${num_t0}_${num_t1}
         num_training=$(expr 2 \* $n)
         num_str=${num_training}_${num_total}
         python -m uncertain.learn $imagesParent/merged_${n}/upto_${i} $num_str ${outputFiles[$i]} $model_output_folder
