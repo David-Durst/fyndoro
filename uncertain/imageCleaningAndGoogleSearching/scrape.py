@@ -11,7 +11,7 @@ import sys
 # third, optional input is a string of inputs separated by spaces to filter scraped images based on
 dirToDownload = sys.argv[1]
 outputDir = sys.argv[2]
-if len(sys.argv == 4):
+if len(sys.argv) == 4:
     scrapeKeywords = sys.argv[3].lower().split(" ")
 else:
     scrapeKeywords = False
