@@ -64,7 +64,7 @@ with Browser() as browser:
                 time.sleep(0.1)
                 if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
                     print("skipping image " + str(numDownloaded - 1) + " as no View Image button", flush=True)
-                    print(browser.html, flush=True)
+                    print(browser.url, flush=True)
                     continue
                 elif scrapeKeywords != False:
                     noMatchingKeywords = True
@@ -76,7 +76,7 @@ with Browser() as browser:
                             break
                     if noMatchingKeywords:
                         print("skipping image " + str(numDownloaded - 1) + " as matches no keywords in description", flush=True)
-                        print(browser.html, flush=True)
+                        print(browser.url, flush=True)
                         continue
                     else:
                         print("downloading image " + str(numDownloaded - 1) + " that matches keyword " + matchKeyword, flush=True)
@@ -97,7 +97,7 @@ with Browser() as browser:
                     browser.get_alert().dismiss()
                 except Exception:
                     print("Exception not alert", flush=True)
-                print("Browser data", flush=True)
+                print("Browser url for exception", flush=True)
                 print(browser.url, flush=True)
 
 
