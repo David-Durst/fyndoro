@@ -111,16 +111,14 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=125):
             # Iterate over data.
             for data in dset_loaders[phase]:
                 # get the inputs
-                inputs, labelIndices = data
-
-                labelProbabilities = torch.FloatTensor([classIndexToProbability(index, dsets[phase].class_to_idx) for index in labelIndices])
+                inputs, labels = data
 
                 # wrap them in Variable
                 if use_gpu:
-                    inputs, labelProbabilitiesVar = Variable(inputs.cuda()), \
-                        Variable(labelProbabilities.cuda())
+                    inputs = Variable(inputs.cuda())
+                    labels = Variable(labels.cuda())
                 else:
-                    inputs, labelProbabilitiesVar = Variable(inputs), Variable(labelProbabilities)
+                    inputs, labels = Variable(inputs), Variable(labels)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
@@ -128,15 +126,13 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs=125):
                 # forward
                 outputs = model(inputs)
                 _, preds = torch.max(outputs.data, 1)
-                loss = criterion(outputs, labelProbabilitiesVar)
+                loss = criterion(outputs, labels)
 
                 # backward + optimize only if in training phase
                 if phase == 'train':
                     loss.backward()
                     optimizer.step()
 
-                # the correct label is the one with greatest probability
-                _, labels = torch.max(labelProbabilitiesVar, dim=1)
                 # statistics
                 running_loss += loss.data[0]
                 running_corrects += torch.sum(preds == labels.data)
@@ -187,7 +183,7 @@ model_ft.fc = nn.Linear(num_ftrs, 2)
 if use_gpu:
     model_ft = model_ft.cuda()
 
-criterion = UncertainCrossEntropyLoss()
+criterion = nn.CrossEntropyLoss()
 
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(model_ft.fc.parameters(), lr=0.001, momentum=0.9)
