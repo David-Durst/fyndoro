@@ -123,11 +123,15 @@ do
     mergedSubset=$images/merged_${sumIncrementsSoFar}
     rm -rf $mergedSubset
     mkdir -p $mergedSubset
+    set +x
     cp -r $subsetImages/* $mergedSubset
+    set -x
     rm -rf $subsetImages
     if [ $i -gt 1 ]
     then
+        set +x
         cp -r $previousMergedSubset/* $mergedSubset
+        set -x
     fi
 
     echo "Number of images in " $mergedSubset
