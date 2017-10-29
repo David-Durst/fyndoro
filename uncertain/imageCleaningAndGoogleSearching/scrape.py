@@ -25,11 +25,14 @@ imagesToDownloadPerImage=100
 # from https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
 imageFiles = [f for f in os.listdir(dirToDownload) if isfile(join(dirToDownload, f))]
 
+def setTimeoutTime(browser, timeoutSeconds):
+    browser.driver.set_page_load_timeout(timeoutSeconds)
 
 with Browser() as browser:
     # only wait on pages for 10 seconds, not 15 minutes
-    browser.driver.set_page_load_timeout(10)
     for imgFileName in imageFiles:
+        # google not going to timeout, want to wait for it to return
+        setTimeoutTime(browser, 300)
         browser.visit("https://images.google.com/")
         #start_time = time.time()
         # wait a random number of seconds between 3 and 5 to ensure don't get blocked
@@ -58,6 +61,8 @@ with Browser() as browser:
         print(imgFileName, flush=True)
         processList = []
 
+        # don't trust the websites google is sending me too, timeout quickly on them
+        setTimeoutTime(browser, 10)
         for image in images:
             if numDownloaded > imagesToDownloadPerImage:
                 break
