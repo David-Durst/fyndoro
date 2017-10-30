@@ -110,10 +110,10 @@ do
             if [ $j == 1 ]
             then
                 mkdir -p $uptoCurDir
-                cp -r $curIterDir/* $uptoCurDir/
+                rsync --ignore-existing -a $curIterDir/ $uptoCurDir/
             fi
-            cp -r $nextIterDir/* $uptoNextIterDir/
-            cp -r $uptoCurDir/* $uptoNextIterDir/
+            rsync --ignore-existing -a $nextIterDir/ $uptoNextIterDir/
+            rsync --ignore-existing -a $uptoCurDir/ $uptoNextIterDir/
         done
     done
 
@@ -123,20 +123,18 @@ do
     mergedSubset=$images/merged_${sumIncrementsSoFar}
     rm -rf $mergedSubset
     mkdir -p $mergedSubset
-    set +x
-    cp -r $subsetImages/* $mergedSubset
-    set -x
+    mv $subsetImages $mergedSubset
     rm -rf $subsetImages
     if [ $i -gt 1 ]
     then
-        set +x
-        cp -r $previousMergedSubset/* $mergedSubset
-        set -x
+        rsync --ignore-existing -a $previousMergedSubset/ $mergedSubset/
     fi
 
     echo "Number of images in " $mergedSubset
     # https://unix.stackexchange.com/questions/4105/how-do-i-count-all-the-files-recursively-through-directories
+    set +x
     find $mergedSubset -type d | while read -r dir; do printf "%s:\t" "$dir"; find "$dir" -type f | wc -l; done
+    set -x
 
     previousMergedSubset=$mergedSubset
 done
