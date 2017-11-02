@@ -21,7 +21,7 @@ imagesToDownload = 200
 #python imageCleaningAndGoogleSearching/scrapeEbay.py "diet dr pepper" /home/durst/fyndoro/uncertain/userdatasets/drpepperOrPepsi/val1.0,0.0 &> userdatasets/drppOther.log
 with Browser() as browser:
     # only wait on pages for 10 seconds, not 15 minutes
-    browser.driver.set_gitpage_load_timeout(10)
+    browser.driver.set_page_load_timeout(10)
     browser.visit("https://www.ebay.com/")
     #start_time = time.time()
     # search for the query

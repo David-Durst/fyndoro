@@ -25,7 +25,7 @@ for dfsForTrial in allDFs:
             dfsForTrial[i].plot(x=columns[1], y=columns[2], ax=ax)
     plt.savefig(pathToTrialsData + "vis_trial" + str(trialIdx))
 
-exit
+
 # acerage the dataframes across all trials
 averagedDFs = []
 plt.figure()
