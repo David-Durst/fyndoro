@@ -122,7 +122,6 @@ do
     sumIncrementsSoFar=$(expr $sumIncrementsSoFar + ${trainIncrements[$idx]})
     mergedSubset=${images}merged_${sumIncrementsSoFar}
     rm -rf $mergedSubset
-    mkdir -p $mergedSubset
     mv $subsetImages $mergedSubset
     rm -rf $subsetImages
     if [ $i -gt 1 ]
