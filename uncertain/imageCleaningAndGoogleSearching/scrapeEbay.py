@@ -28,7 +28,7 @@ with Browser() as browser:
     browser.find_by_css("#gh-ac").fill(queryToDownload)
     browser.find_by_css("#gh-btn").click()
     # get 200 results if possible
-    if len(browser.find_by_css(".dropdown-toggle")) >= 2:
+    if len(browser.find_by_css(".dropdown-toggle")) >= 3:
         browser.find_by_css(".dropdown-toggle")[2].click()
     browser.find_by_css(".ipp")[3].click()
     time.sleep(0.5)
