@@ -30,7 +30,7 @@ with Browser() as browser:
     # get 200 results if possible
     if len(browser.find_by_css(".dropdown-toggle")) >= 3:
         browser.find_by_css(".dropdown-toggle")[2].click()
-    browser.find_by_css(".ipp")[3].click()
+    #browser.find_by_css(".ipp")[3].click()
     time.sleep(0.5)
     listingPages = [x['href'] for x in browser.find_by_css(".vip")]
     numDownloaded = 0
