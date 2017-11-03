@@ -11,6 +11,5 @@ sed -i 's/-//g' $treeFile
 sed -i 's/[[:blank:]]*$//g' $treeFile
 i=0
 while read wnid; do
-  i=$(expr $i + 1)
+  ./downloadImagenet.sh $wnid $2 $3
 done < $treeFile
-echo $i
