@@ -28,9 +28,12 @@ with Browser() as browser:
     browser.find_by_css("#gh-ac").fill(queryToDownload)
     browser.find_by_css("#gh-btn").click()
     # get 200 results if possible
+    # this checks if the dropdown down toggle exists, if more than 50 results
     if len(browser.find_by_css(".dropdown-toggle")) >= 3:
+        # this toggles the drop down menu
         browser.find_by_css(".dropdown-toggle")[2].click()
-    #browser.find_by_css(".ipp")[3].click()
+        # this picks the menu item for
+        browser.find_by_css(".ipp")[3].click()
     time.sleep(0.5)
     listingPages = [x['href'] for x in browser.find_by_css(".vip")]
     numDownloaded = 0
