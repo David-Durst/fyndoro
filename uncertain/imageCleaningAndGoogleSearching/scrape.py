@@ -68,6 +68,9 @@ with Browser() as browser:
                 break
             numDownloaded += 1
             try:
+                if "ebay" in image:
+                    print("skipping image " + str(numDownloaded - 1) + " as comes from ebay", flush=True)
+                    continue
                 browser.visit(image)
                 time.sleep(0.1)
                 if len(browser.find_by_css(".irc_fsl.irc_but.i3596")) == 0:
