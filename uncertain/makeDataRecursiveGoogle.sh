@@ -7,11 +7,11 @@ images=$1
 createTrainVal=true
 createDatasets=true
 categoryGroups=("scarletTanager" "summerTanager")
-declare -A keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")
-numIterations=3
-trainImages=5
+declare -A keywordFilters=( [${categoryGroups[0]}]="ti cas" [${categoryGroups[1]}]="hp 50g")
+numIterations=1
+trainImages=200
 # note that train increments need to sum to trainImages
-trainIncrements=(1 1 3)
+trainIncrements=(1 4 5 20 20 50 100)
 cat1Images=$(ls -1 $images/${categoryGroups[0]} | wc -l)
 cat2Images=$(ls -1 $images/${categoryGroups[1]} | wc -l)
 export MOZ_HEADLESS=1
@@ -102,8 +102,8 @@ do
                 shuf -n ${trainIncrements[$idx]} -e $images/train/$c/* | xargs -I {} mv {} $curIterDir/
                 set -x
             fi
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}"
-            python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
+            #python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}"
+            #python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
             # join next iter images with all previous ones
             mkdir -p $uptoNextIterDir
             # if first iter, make upToCurDir as no prev iteration to make it
