@@ -41,8 +41,8 @@ dsets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
 use_gpu = torch.cuda.is_available()
 
 model = models.resnet18(pretrained=True)
-for param in model.parameters():
-    param.requires_grad = False
+#for param in model.parameters():
+#    param.requires_grad = False
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, 2)
 model.load_state_dict(torch.load(model_input_location))

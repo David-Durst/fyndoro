@@ -8,7 +8,7 @@ numTrials = ['']
 pathToTrialsData = sys.argv[1]
 outputName = sys.argv[2]
 # a list of the run
-runTypes = ["1", "2", "3", "4"]
+runTypes = ["1"]
 
 allDFs = [[pd.read_csv(pathToTrialsData + str(x) + y + ".csv") for y in runTypes] for x in numTrials]
 
@@ -19,10 +19,11 @@ for dfsForTrial in allDFs:
     for i in range(len(runTypes)):
         columns = dfsForTrial[i].columns
         if i == 0:
-            ax = dfsForTrial[i].plot(x=columns[1], y=columns[2])
+            ax = dfsForTrial[i].plot(x=columns[1], y=columns[2], linestyle='--', marker='o')
+            ax.set_ylabel('Best Validation Accuracy Across All Epochs')
             plt.title(outputName + str(trialIdx))
         else:
-            dfsForTrial[i].plot(x=columns[1], y=columns[2], ax=ax)
+            dfsForTrial[i].plot(x=columns[1], y=columns[2], ax=ax, linestyle='--', marker='o')
     plt.savefig(pathToTrialsData + "vis_trial" + str(trialIdx))
 
 
@@ -39,8 +40,8 @@ for i in range(len(runTypes)):
     plottingColumns = allDFs[0][i].columns[1:3]
     dfToPlot = pd.concat([allDFs[0][i][allDFs[0][i].columns[1]],avgCol], axis=1, keys=plottingColumns)
     if i == 0:
-        ax = dfToPlot.plot(x=plottingColumns[0], y=plottingColumns[1])
+        ax = dfToPlot.plot(x=plottingColumns[0], y=plottingColumns[1], linestyle='--', marker='o')
         plt.title(outputName + str("avg"))
     else:
-        dfToPlot.plot(x=plottingColumns[0], y=plottingColumns[1], ax=ax)
+        dfToPlot.plot(x=plottingColumns[0], y=plottingColumns[1], ax=ax, linestyle='--', marker='o')
 plt.savefig(pathToTrialsData + "vis_avg")

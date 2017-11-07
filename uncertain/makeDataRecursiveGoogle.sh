@@ -47,7 +47,9 @@ if [ $createDatasets == false ] || [ ! -d $images/trainbackup ] ; then
     rm -rf $images/valbackup
     cp -r $images/train $images/trainbackup
     cp -r $images/val $images/valbackup
-    exit 0
+    if [ $createDatasets == false ] ; then
+        exit 0
+    fi
 fi
 
 if [ $createDatasets == true ] && [ $createTrainVal == false ] ; then

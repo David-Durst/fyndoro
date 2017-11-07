@@ -1,7 +1,8 @@
+import torch
 import pandas as pd
 import os
 
-def loadModel(modelLocation):
+def loadModelApplicationResults(modelLocation):
     with open(modelLocation, 'r') as f:
         trainAndVal = eval(f.read())
         results = {}
