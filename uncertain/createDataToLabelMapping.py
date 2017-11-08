@@ -48,8 +48,13 @@ num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, 2)
 model.load_state_dict(torch.load(model_input_location))
 
+# this produces the same model but with the last, fully connected layer removed
+# so that the embedding of the image into a 512 dimension space is outputted
+embedding_model = nn.Sequential(*list(model.children())[:-1])
+
 if use_gpu:
     model = model.cuda()
+    embedding_model = embedding_model.cuda()
 
 outputs = {}
 for phase in ['train', 'val']:
@@ -67,13 +72,17 @@ for phase in ['train', 'val']:
         else:
             inputs = Variable(inputs)
         # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
-        result = F.softmax(model(inputs)).data
+        classProbabilityTensor = F.softmax(model(inputs)).data
+        embeddingTensor = embedding_model(inputs).data
         if use_gpu:
-            result = result.cpu().numpy()[0].tolist()
+            resultsList = classProbabilityTensor.cpu().numpy()[0].tolist()
+            embeddingList = embeddingTensor.cpu().numpy()[0].tolist()
         else:
-            result = result.numpy()[0].tolist()
-        result.insert(0, dsets[phase].imgs[i][0])
-        outputs[phase].append(result)
+            resultsList = classProbabilityTensor.numpy()[0].tolist()
+            embeddingList = embeddingTensor.numpy()[0].tolist()
+        resultsList.insert(0, dsets[phase].imgs[i][0])
+        resultsList.append(embeddingList)
+        outputs[phase].append(resultsList)
         i += 1
 
 with open(output_file, 'w') as f:
