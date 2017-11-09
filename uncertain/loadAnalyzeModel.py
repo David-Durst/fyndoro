@@ -1,4 +1,8 @@
-import torch
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
 import pandas as pd
 import os
 
@@ -9,6 +13,49 @@ def loadModelApplicationResults(modelLocation):
         results["train"] = pd.DataFrame.from_dict(trainAndVal["train"])
         results["val"] = pd.DataFrame.from_dict(trainAndVal["val"])
         return results
+
+def getEmbeddingsNPArr(modelResults, trainOrValKey):
+    # need to go DF of lists of floats to list of lists of floats to np array of floats
+    # as otherwise to np converter choses lists as its base type
+    embeddingsDF = modelResults[trainOrValKey][3].apply(lambda x: np.array(x))
+    return np.array(embeddingsDF.tolist())
+
+class valElementMostSimilar(object):
+    def __init__(self, valIndex, trainIndex, distance, valFilename, trainFilename):
+        self.valIndex = valIndex
+        self.trainIndex = trainIndex
+        self.distance = distance
+        self.valFilename = valFilename
+        self.trainFilename = trainFilename
+
+    def to_dict(self):
+        return {
+            "valIndex": self.valIndex,
+            "trainIndex": self.trainIndex,
+            "distance": self.distance,
+            "valFilename": self.valFilename,
+            "trainFilename": self.trainFilename
+        }
+
+    def __str__(self):
+        return "valIndex: {}, trainIndex: {}, distance: {}, valFilename: {}, trainFilename: {}".format(self.valIndex, self.trainIndex, self.distance, self.valFilename, self.trainFilename)
+
+def getMostSimilarTrainPointForEachVal(modelResults):
+    trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
+    valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
+    nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(np.array(trainEmbeddingsNP))
+    distances, nearestTrainIndexForEachValNestedArr = nbrs.kneighbors(valEmbeddingsNP)
+    # normally, each element is an array (as may have more than 1 nearest neighbor)
+    # remove the array per val element as only 1 nearest neighbor in train
+    nearestTrainIndexForEachVal = np.apply_along_axis(lambda x: x[0], 1, nearestTrainIndexForEachValNestedArr)
+    mostSimilarClassesList = [valElementMostSimilar(valIndex, trainIndex, distances[valIndex][0], modelResults["val"][0][valIndex], modelResults["train"][0][trainIndex]) for valIndex, trainIndex in enumerate(nearestTrainIndexForEachVal)]
+    return pd.DataFrame.from_dict([mostSimilarEl.to_dict() for mostSimilarEl in mostSimilarClassesList])
+
+def getMostSimilarDistanceDistibution(modelResults):
+    mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults)
+    ax = mostSimilarDF.hist("distance")
+    fig = ax.get_figure()
+    fig.savefig('mostSimilarDistances.pdf')
 
 
 def uncertain(valAndTrain):
