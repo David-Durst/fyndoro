@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import pandas as pd
+pd.options.display.max_colwidth = 100
 import os
 
 def loadModelApplicationResults(modelLocation):
@@ -53,10 +54,23 @@ def getMostSimilarTrainPointForEachVal(modelResults):
 
 def getMostSimilarDistanceDistibution(modelResults):
     mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults)
-    ax = mostSimilarDF.hist("distance")
-    fig = ax.get_figure()
-    fig.savefig('mostSimilarDistances.pdf')
+    plt.close()
+    mostSimilarDF.hist("distance")
+    plt.savefig('mostSimilarDistances.pdf')
 
+def getExamplesBySimilarity(modelResults, outputLocation):
+    increments = 0.1
+    splitPoints = np.arrange(0.0, 1.5, increments)
+    mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults).sort_values('distance')
+    for pnt in splitPoints:
+        mostSimilarAtPntDF = mostSimilarDF[(mostSimilarDF['distance'] >= pnt) & (mostSimilarDF['distance'] < pnt + increments)].head(5)
+        pntFolderPath = outputLocation + "/" + str(pnt)
+        os.system("mkdir " + pntFolderPath)
+        for i in len(mostSimilarAtPntDF):
+            ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
+            os.system("mkdir " + pntFolderPath + "/" + str(ithSimilarAtPnt['distance']))
+            os.system("cp " + mostSimilarAtPntDF['trainFilename'] + " " + outputLocation + "/")
+            os.system("cp " + mostSimilarAtPntDF['valFilename'] + " " + outputLocation + "/")
 
 def uncertain(valAndTrain):
     val = valAndTrain["val"]
