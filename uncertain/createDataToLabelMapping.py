@@ -73,13 +73,15 @@ for phase in ['train', 'val']:
             inputs = Variable(inputs)
         # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
         classProbabilityTensor = F.softmax(model(inputs)).data
-        embeddingTensor = embedding_model(inputs).data
+        # view -1 to remove the many, unnecessary dimensions that
+        # have 1 value
+        embeddingTensor = embedding_model(inputs).data.view(-1)
         if use_gpu:
             resultsList = classProbabilityTensor.cpu().numpy()[0].tolist()
-            embeddingList = embeddingTensor.cpu().numpy()[0].tolist()
+            embeddingList = embeddingTensor.cpu().numpy().tolist()
         else:
             resultsList = classProbabilityTensor.numpy()[0].tolist()
-            embeddingList = embeddingTensor.numpy()[0].tolist()
+            embeddingList = embeddingTensor.numpy().tolist()
         resultsList.insert(0, dsets[phase].imgs[i][0])
         resultsList.append(embeddingList)
         outputs[phase].append(resultsList)
