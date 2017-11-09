@@ -60,7 +60,7 @@ def getMostSimilarDistanceDistibution(modelResults):
 
 def getExamplesBySimilarity(modelResults, outputLocation):
     increments = 0.1
-    splitPoints = np.arrange(0.0, 1.5, increments)
+    splitPoints = np.arange(0.0, 1.5, increments)
     mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults).sort_values('distance')
     for pnt in splitPoints:
         mostSimilarAtPntDF = mostSimilarDF[(mostSimilarDF['distance'] >= pnt) & (mostSimilarDF['distance'] < pnt + increments)].head(5)
