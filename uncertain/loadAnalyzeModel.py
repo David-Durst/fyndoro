@@ -66,7 +66,7 @@ def getExamplesBySimilarity(modelResults, outputLocation):
         mostSimilarAtPntDF = mostSimilarDF[(mostSimilarDF['distance'] >= pnt) & (mostSimilarDF['distance'] < pnt + increments)].head(5)
         pntFolderPath = outputLocation + "/" + str(pnt)
         os.system("mkdir " + pntFolderPath)
-        for i in len(mostSimilarAtPntDF):
+        for i in range(len(mostSimilarAtPntDF)):
             ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
             os.system("mkdir " + pntFolderPath + "/" + str(ithSimilarAtPnt['distance']))
             os.system("cp " + mostSimilarAtPntDF['trainFilename'] + " " + outputLocation + "/")
