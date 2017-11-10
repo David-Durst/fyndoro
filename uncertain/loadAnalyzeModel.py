@@ -47,7 +47,7 @@ class valElementMostSimilar(object):
 def getMultipleSimilarTrainPointsForEachVal(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
     valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
-    nbrs = NearestNeighbors(n_neighbors=5, algorithm='ball_tree').fit(np.array(trainEmbeddingsNP))
+    nbrs = NearestNeighbors(n_neighbors=5, metric="cosine", algorithm='auto').fit(np.array(trainEmbeddingsNP))
     distances, nearestTrainIndicesForEachValNestedArr = nbrs.kneighbors(valEmbeddingsNP)
     mostSimilarClassesList = [valElementMostSimilar(valIndex, trainIndices.tolist(), distances[valIndex].tolist(),
                                                     modelResults["val"][0][valIndex],
@@ -57,9 +57,9 @@ def getMultipleSimilarTrainPointsForEachVal(modelResults):
 
 
 def getMultipleExamplesBySimilarity(modelResults, outputLocation):
-    increments = 0.1
+    increments = 0.0001
     os.system("mkdir " + outputLocation)
-    splitPoints = np.arange(0.0, 1.5, increments)
+    splitPoints = np.arange(0.0, 0.002, increments)
     mostSimilarDF = getMultipleSimilarTrainPointsForEachVal(modelResults).sort_values('distance')
     for pnt in splitPoints:
         # a series containg the first, smallest value of the distance column for each row in mostSimilarDF
@@ -83,7 +83,7 @@ def getMultipleExamplesBySimilarity(modelResults, outputLocation):
 def getMostSimilarTrainPointForEachVal(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
     valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
-    nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(np.array(trainEmbeddingsNP))
+    nbrs = NearestNeighbors(n_neighbors=1, metric="cosine", algorithm='auto').fit(np.array(trainEmbeddingsNP))
     distances, nearestTrainIndexForEachValNestedArr = nbrs.kneighbors(valEmbeddingsNP)
     # normally, each element is an array (as may have more than 1 nearest neighbor)
     # remove the array per val element as only 1 nearest neighbor in train
@@ -94,7 +94,7 @@ def getMostSimilarTrainPointForEachVal(modelResults):
 def getMostSimilarDistanceDistibution(modelResults):
     mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults)
     plt.close()
-    mostSimilarDF.hist("distance")
+    mostSimilarDF.hist("distance", bins=20)
     plt.savefig('mostSimilarDistances.pdf')
 
 def getExamplesBySimilarity(modelResults, outputLocation):
