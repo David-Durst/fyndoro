@@ -59,9 +59,9 @@ def getMostSimilarDistanceDistibution(modelResults):
     plt.savefig('mostSimilarDistances.pdf')
 
 def getExamplesBySimilarity(modelResults, outputLocation):
-    increments = 0.1
+    increments = 0.025
     os.system("mkdir " + outputLocation)
-    splitPoints = np.arange(0.0, 1.5, increments)
+    splitPoints = np.arange(0.95, 1.15, increments)
     mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults).sort_values('distance')
     for pnt in splitPoints:
         mostSimilarAtPntDF = mostSimilarDF[(mostSimilarDF['distance'] >= pnt) & (mostSimilarDF['distance'] < pnt + increments)].head(5)
