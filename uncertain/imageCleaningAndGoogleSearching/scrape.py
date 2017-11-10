@@ -11,8 +11,9 @@ import sys
 # third, optional input is a string of inputs separated by spaces to filter scraped images based on
 dirToDownload = sys.argv[1]
 outputDir = sys.argv[2]
-if len(sys.argv) == 4:
+if len(sys.argv) == 5:
     scrapeKeywords = sys.argv[3].lower().split(" ")
+    scrapeWrongwords = sys.argv[4].lower().split(" ")
     print("scrapeKeywords are:")
     for keyword in scrapeKeywords:
         print(keyword)
@@ -44,11 +45,11 @@ with Browser() as browser:
         browser.attach_file("encoded_image", join(dirToDownload, imgFileName))
         time.sleep(0.5)
         while browser.find_by_id("qbupm"):
-            print("stalling for image", flush=True)
+            print("stalling for image upload", flush=True)
             time.sleep(0.5)
         visSimLink = browser.find_by_text("Visually similar images")
         if len(visSimLink) == 0:
-            print("didn't find vissim", flush=True)
+            print("didn't find link to visually similar images", flush=True)
             print(browser.url, flush=True)
             print(browser.html, flush=True)
             continue
@@ -75,19 +76,14 @@ with Browser() as browser:
                     print(browser.url, flush=True)
                     continue
                 elif scrapeKeywords != False:
-                    noMatchingKeywords = True
                     pageHTML = browser.html.lower()
-                    for keyword in scrapeKeywords:
-                        if pageHTML.find(keyword) > -1:
-                            noMatchingKeywords = False
-                            matchKeyword = keyword
-                            break
-                    if noMatchingKeywords:
+                    if all(keyword in pageHTML for keyword in scrapeKeywords) and not \
+                            any(wrongWord in pageHTML for wrongWord in scrapeWrongwords):
                         print("skipping image " + str(numDownloaded - 1) + " as matches no keywords in description", flush=True)
                         print(browser.url, flush=True)
                         continue
                     else:
-                        print("downloading image " + str(numDownloaded - 1) + " that matches keyword " + matchKeyword, flush=True)
+                        print("downloading image " + str(numDownloaded - 1) + " that matches all keywords, no wrongwords", flush=True)
                 else:
                     print("downloading image " + str(numDownloaded - 1), flush=True)
                 imgToDownload = browser.find_by_css(".irc_fsl.irc_but.i3596")[1]['href']
@@ -97,7 +93,6 @@ with Browser() as browser:
                 print("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", flush=True)
                 process = subprocess.Popen("timeout 30 wget -t 3 --directory-prefix " + outputDir + " \"" + imgToDownload + "\"", shell=True)
                 processList.append(process)
-                #process.wait()
             except Exception as e:
                 print("Caught exception", flush=True)
                 print(e, flush=True)
@@ -108,10 +103,5 @@ with Browser() as browser:
                 print("Browser url for exception", flush=True)
                 print(browser.url, flush=True)
 
-
         for process in processList:
             process.wait()
-
-        #end_time = time.time()
-        #if end_time > start_time + wait_time:
-        #    time.sleep(end_time - start_time - wait_time)
