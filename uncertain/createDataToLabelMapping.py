@@ -46,7 +46,7 @@ model = models.resnet18(pretrained=True)
 #    param.requires_grad = False
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, 2)
-model.load_state_dict(torch.load(model_input_location))
+#model.load_state_dict(torch.load(model_input_location))
 
 # this produces the same model but with the last, fully connected layer removed
 # so that the embedding of the image into a 512 dimension space is outputted
