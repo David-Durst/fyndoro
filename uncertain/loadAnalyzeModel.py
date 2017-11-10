@@ -60,6 +60,7 @@ def getMostSimilarDistanceDistibution(modelResults):
 
 def getExamplesBySimilarity(modelResults, outputLocation):
     increments = 0.1
+    os.system("mkdir " + outputLocation)
     splitPoints = np.arange(0.0, 1.5, increments)
     mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults).sort_values('distance')
     for pnt in splitPoints:
@@ -68,9 +69,10 @@ def getExamplesBySimilarity(modelResults, outputLocation):
         os.system("mkdir " + pntFolderPath)
         for i in range(len(mostSimilarAtPntDF)):
             ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
-            os.system("mkdir " + pntFolderPath + "/" + str(ithSimilarAtPnt['distance']))
-            os.system("cp " + ithSimilarAtPnt['trainFilename'] + " " + outputLocation + "/")
-            os.system("cp " + ithSimilarAtPnt['valFilename'] + " " + outputLocation + "/")
+            ithOutputPath = pntFolderPath + "/" + str(i) + "_" + str(ithSimilarAtPnt['distance'])
+            os.system("mkdir " + ithOutputPath)
+            os.system("cp " + ithSimilarAtPnt['trainFilename'] + " " + ithOutputPath + "/")
+            os.system("cp " + ithSimilarAtPnt['valFilename'] + " " + ithOutputPath + "/")
 
 def uncertain(valAndTrain):
     val = valAndTrain["val"]
