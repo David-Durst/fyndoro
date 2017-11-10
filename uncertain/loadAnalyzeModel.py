@@ -41,6 +41,9 @@ class valElementMostSimilar(object):
     def __str__(self):
         return "valIndex: {}, trainIndex: {}, distance: {}, valFilename: {}, trainFilename: {}".format(self.valIndex, self.trainIndex, self.distance, self.valFilename, self.trainFilename)
 
+#import loadAnalyzeModel
+#res = loadAnalyzeModel.loadModelApplicationResults("birds2Models_4/dataToLabels_10_2755_1227")
+#loadAnalyzeModel.getMultipleExamplesBySimilarity(res, "birds2Models_4/multiple_examples_10_2755_1227")
 def getMultipleSimilarTrainPointsForEachVal(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
     valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
@@ -74,6 +77,7 @@ def getMultipleExamplesBySimilarity(modelResults, outputLocation):
             os.system("cp \"" + ithSimilarAtPnt['valFilename'] + "\" " + valPointOutputPath + "/")
             for j in range(len(ithSimilarAtPnt['distance'])):
                 trainPointOutputPath = valPointOutputPath + "/" + str(j) + "_" + str(ithSimilarAtPnt['distance'][j])
+                os.system("mkdir " + trainPointOutputPath)
                 os.system("cp \"" + ithSimilarAtPnt['trainFilename'][j] + "\" " + trainPointOutputPath + "/")
 
 def getMostSimilarTrainPointForEachVal(modelResults):
