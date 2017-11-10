@@ -71,8 +71,8 @@ def getExamplesBySimilarity(modelResults, outputLocation):
             ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
             ithOutputPath = pntFolderPath + "/" + str(i) + "_" + str(ithSimilarAtPnt['distance'])
             os.system("mkdir " + ithOutputPath)
-            os.system("cp " + ithSimilarAtPnt['trainFilename'] + " " + ithOutputPath + "/")
-            os.system("cp " + ithSimilarAtPnt['valFilename'] + " " + ithOutputPath + "/")
+            os.system("cp \"" + ithSimilarAtPnt['trainFilename'] + "\" " + ithOutputPath + "/")
+            os.system("cp \"" + ithSimilarAtPnt['valFilename'] + "\" " + ithOutputPath + "/")
 
 def uncertain(valAndTrain):
     val = valAndTrain["val"]
