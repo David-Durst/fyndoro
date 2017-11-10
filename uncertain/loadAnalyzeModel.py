@@ -41,6 +41,41 @@ class valElementMostSimilar(object):
     def __str__(self):
         return "valIndex: {}, trainIndex: {}, distance: {}, valFilename: {}, trainFilename: {}".format(self.valIndex, self.trainIndex, self.distance, self.valFilename, self.trainFilename)
 
+def getMultipleSimilarTrainPointsForEachVal(modelResults):
+    trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
+    valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
+    nbrs = NearestNeighbors(n_neighbors=5, algorithm='ball_tree').fit(np.array(trainEmbeddingsNP))
+    distances, nearestTrainIndicesForEachValNestedArr = nbrs.kneighbors(valEmbeddingsNP)
+    mostSimilarClassesList = [valElementMostSimilar(valIndex, trainIndices.tolist(), distances[valIndex].tolist(),
+                                                    modelResults["val"][0][valIndex],
+                                                    modelResults["train"][0][trainIndices].tolist()) for
+                              valIndex, trainIndices in enumerate(nearestTrainIndicesForEachValNestedArr)]
+    return pd.DataFrame.from_dict([mostSimilarEl.to_dict() for mostSimilarEl in mostSimilarClassesList])
+
+
+def getMultipleExamplesBySimilarity(modelResults, outputLocation):
+    increments = 0.1
+    os.system("mkdir " + outputLocation)
+    splitPoints = np.arange(0.0, 1.5, increments)
+    mostSimilarDF = getMultipleSimilarTrainPointsForEachVal(modelResults).sort_values('distance')
+    for pnt in splitPoints:
+        # a series containg the first, smallest value of the distance column for each row in mostSimilarDF
+        firstDistanceValueSeries = mostSimilarDF['distance'].apply(lambda xs: xs[0])
+        mostSimilarAtPntDF = mostSimilarDF[(firstDistanceValueSeries >= pnt) & (firstDistanceValueSeries < pnt + increments)].head(5)
+        pntFolderPath = outputLocation + "/" + str(pnt)
+        os.system("mkdir " + pntFolderPath)
+        # i iterates over the validation points, each validation has multiple training points
+        # associated with it. (number of val points is number of neighbors above) j iterates
+        # over training points
+        for i in range(len(mostSimilarAtPntDF)):
+            ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
+            valPointOutputPath = pntFolderPath + "/" + str(i) + "_" + str(ithSimilarAtPnt['distance'][0])
+            os.system("mkdir " + valPointOutputPath)
+            os.system("cp \"" + ithSimilarAtPnt['valFilename'] + "\" " + valPointOutputPath + "/")
+            for j in range(len(ithSimilarAtPnt['distance'])):
+                trainPointOutputPath = valPointOutputPath + "/" + str(j) + "_" + str(ithSimilarAtPnt['distance'][j])
+                os.system("cp \"" + ithSimilarAtPnt['trainFilename'][j] + "\" " + trainPointOutputPath + "/")
+
 def getMostSimilarTrainPointForEachVal(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
     valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
