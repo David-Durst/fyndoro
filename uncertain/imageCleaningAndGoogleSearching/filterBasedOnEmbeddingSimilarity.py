@@ -22,7 +22,7 @@ def getEmbeddingsNPArr(modelResults, trainOrValKey):
     return np.array(embeddingsDF.tolist())
 
 class valElementMostSimilar(object):
-    def __init__(self, valIndex, trainIndex, distance, valFilename, trainFilename):
+    def __init__(self, trainIndex, valIndex, distance, trainFilename, valFilename):
         self.valIndex = valIndex
         self.trainIndex = trainIndex
         self.distance = distance
@@ -61,6 +61,6 @@ def removeTooSimiliar(modelResults):
         os.system("rm \"" + tooSimilarDF.iloc[i]['trainFilename'] + "\"")
 
 data_embeddings = sys.argv[1]
-model_results = data_embeddings(loadModelApplicationResults)
+model_results = loadModelApplicationResults(data_embeddings)
 removeTooSimiliar(model_results)
 
