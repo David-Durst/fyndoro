@@ -108,6 +108,8 @@ do
             fi
             python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}" "${wrongwordFilters[$c]}"
             python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
+            python $scriptDir/getEmbeddingsForData.py $nextIterDir/ "" $images/
+            python $scriptDir/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $nextIterDir/
             # join next iter images with all previous ones
             mkdir -p $uptoNextIterDir
             # if first iter, make upToCurDir as no prev iteration to make it

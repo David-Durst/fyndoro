@@ -15,6 +15,7 @@ import json
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
+# if this is empty, the default model will be used
 model_input_location = sys.argv[2]
 output_file = sys.argv[3]
 
@@ -46,7 +47,9 @@ model = models.resnet18(pretrained=True)
 #    param.requires_grad = False
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, 2)
-model.load_state_dict(torch.load(model_input_location))
+# if model_input_location is empty, use default weights
+if model_input_location != "":
+    model.load_state_dict(torch.load(model_input_location))
 
 # this produces the same model but with the last, fully connected layer removed
 # so that the embedding of the image into a 512 dimension space is outputted
@@ -63,7 +66,7 @@ for phase in ['train', 'val']:
     i = 0
     outputs[phase] = []
     for data in dsets[phase]:
-        print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
+        #print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
         inputs, labelIndices = data
         inputs = inputs.unsqueeze(0)
         # wrap them in Variable
