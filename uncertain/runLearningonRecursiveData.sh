@@ -35,12 +35,16 @@ do
     echo "Running experiments for merged_$n"
     for i in $(seq $numIterations)
     do
-        num_t0=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/${categoryGroups[0]}/ | wc -l)
-        num_t1=$(ls -1 $imagesParent/merged_${n}/upto_${i}/train/${categoryGroups[1]}/ | wc -l)
+        uptoiDir=$imagesParent/merged_${n}/upto_${i}
+        python uncertain/getEmbeddingsForData.py $uptoiDir/ "" $uptoiDir/embeddings
+        python uncertain/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $uptoiDir/embeddings
+        rm $uptoiDir/embeddings
+        num_t0=$(ls -1 $uptoiDir/train/${categoryGroups[0]}/ | wc -l)
+        num_t1=$(ls -1 $uptoiDir/train/${categoryGroups[1]}/ | wc -l)
         num_total=${num_t0}_${num_t1}
         num_training=$(expr 2 \* $n)
         num_str=${num_training}_${num_total}
-        python -m uncertain.learn $imagesParent/merged_${n}/upto_${i} $num_str ${outputFiles[$i]} $model_output_folder
+        python -m uncertain.learn $uptoiDir $num_str ${outputFiles[$i]} $model_output_folder
      done
 done
 
