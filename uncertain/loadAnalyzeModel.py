@@ -74,11 +74,11 @@ def getMultipleExamplesBySimilarity(modelResults, outputLocation):
             ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
             valPointOutputPath = pntFolderPath + "/" + str(i) + "_" + str(ithSimilarAtPnt['distance'][0])
             os.system("mkdir " + valPointOutputPath)
-            os.system("cp \"" + ithSimilarAtPnt['valFilename'] + "\" " + valPointOutputPath + "/")
+            os.system("cp \"" + ithSimilarAtPnt['trainFilename'] + "\" " + valPointOutputPath + "/")
             for j in range(len(ithSimilarAtPnt['distance'])):
                 trainPointOutputPath = valPointOutputPath + "/" + str(j) + "_" + str(ithSimilarAtPnt['distance'][j])
                 os.system("mkdir " + trainPointOutputPath)
-                os.system("cp \"" + ithSimilarAtPnt['trainFilename'][j] + "\" " + trainPointOutputPath + "/")
+                os.system("cp \"" + ithSimilarAtPnt['valFilename'][j] + "\" " + trainPointOutputPath + "/")
 
 def getMostSimilarValPointForEachTrain(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
