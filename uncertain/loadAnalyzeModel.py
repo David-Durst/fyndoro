@@ -88,14 +88,14 @@ def getMostSimilarValPointForEachTrain(modelResults):
     # normally, each element is an array (as may have more than 1 nearest neighbor)
     # remove the array per val element as only 1 nearest neighbor in train
     nearestValIndexForEachTrain = np.apply_along_axis(lambda x: x[0], 1, nearestValIndexForEachTrainNestedArr)
-    mostSimilarClassesList = [valElementMostSimilar(trainIndex, valIndex, distances[valIndex][0], modelResults["train"][0][trainIndex], modelResults["val"][0][valIndex]) for trainIndex, valIndex in enumerate(nearestValIndexForEachTrain)]
+    mostSimilarClassesList = [valElementMostSimilar(trainIndex, valIndex, distances[trainIndex][0], modelResults["train"][0][trainIndex], modelResults["val"][0][valIndex]) for trainIndex, valIndex in enumerate(nearestValIndexForEachTrain)]
     return pd.DataFrame.from_dict([mostSimilarEl.to_dict() for mostSimilarEl in mostSimilarClassesList])
 
 def getMostSimilarDistanceDistibution(modelResults):
     mostSimilarDF = getMostSimilarValPointForEachTrain(modelResults)
     plt.close()
     mostSimilarDF.hist("distance", bins=20)
-    plt.savefig('mostSimilarDistances.pdf')
+    plt.savefig('mostSimilarDistances.png')
 
 def getExamplesBySimilarity(modelResults, outputLocation):
     increments = 0.01

@@ -49,7 +49,7 @@ def getMostSimilarValPointForEachTrain(modelResults):
     # normally, each element is an array (as may have more than 1 nearest neighbor)
     # remove the array per val element as only 1 nearest neighbor in train
     nearestValIndexForEachTrain = np.apply_along_axis(lambda x: x[0], 1, nearestValIndexForEachTrainNestedArr)
-    mostSimilarClassesList = [valElementMostSimilar(trainIndex, valIndex, distances[valIndex][0], modelResults["train"][0][trainIndex], modelResults["val"][0][valIndex]) for trainIndex, valIndex in enumerate(nearestValIndexForEachTrain)]
+    mostSimilarClassesList = [valElementMostSimilar(trainIndex, valIndex, distances[trainIndex][0], modelResults["train"][0][trainIndex], modelResults["val"][0][valIndex]) for trainIndex, valIndex in enumerate(nearestValIndexForEachTrain)]
     return pd.DataFrame.from_dict([mostSimilarEl.to_dict() for mostSimilarEl in mostSimilarClassesList])
 
 # remove all training points which have a cosine distance of less than
