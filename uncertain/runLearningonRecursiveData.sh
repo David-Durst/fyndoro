@@ -56,7 +56,7 @@ do
             num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroups}/ | wc -l)
             num_augmented_images=$num_augmented_images,$num_in_category_group
         done
-        echo $num_augmented_images > $numImagesFile
+        echo $num_augmented_images >> $numImagesFile
         python -m uncertain.learn $uptoiDir $num_imagenet ${outputFiles[$i]} $model_output_folder
      done
 done
