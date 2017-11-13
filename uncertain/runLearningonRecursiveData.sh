@@ -26,10 +26,10 @@ do
 done
 # the number of images in each iteration
 numImagesFile=$scriptDir/output/${outputName}_numimages.csv
-num_images_header="data_dir,number of times augmented, ImageNet images"
+num_images_header="data_dir,number of times augmented,ImageNet images"
 for categoryGroup in "${categoryGroups[@]}"
 do
-    num_images_header=$num_images_header,${categoryGroup}" augmented images"
+    num_images_header=$num_images_header,${categoryGroup}" total images"
 done
 echo $num_images_header > $numImagesFile
 
@@ -50,14 +50,16 @@ do
         python uncertain/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $uptoiDir/embeddings
         rm $uptoiDir/embeddings
         num_imagenet=$(expr 2 \* $n)
+        python -m uncertain.learn $uptoiDir $num_imagenet ${outputFiles[$i]} $model_output_folder
         num_augmented_images=${uptoiDir},$(expr $i - 1),${num_imagenet}
+        set -x
         for categoryGroup in "${categoryGroups[@]}"
         do
             num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroups}/ | wc -l)
             num_augmented_images=$num_augmented_images,$num_in_category_group
         done
+        set +x
         echo $num_augmented_images >> $numImagesFile
-        python -m uncertain.learn $uptoiDir $num_imagenet ${outputFiles[$i]} $model_output_folder
      done
 done
 
