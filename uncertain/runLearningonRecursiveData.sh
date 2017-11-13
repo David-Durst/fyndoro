@@ -15,13 +15,23 @@ cd $scriptDir/..
 
 #make the output files
 outputFiles=()
+# the accuracy of each iteration
 for i in $(seq $numIterations)
 do
     outputFiles[$i]=$scriptDir/output/${outputName}_iter${i}.csv
     rm -f ${outputFiles[$i]}
     touch ${outputFiles[$i]}
-    echo "data_dir,num_labeled,${i}_best_val_acc" > ${outputFiles[$i]}
+    times_augmented=$(expr i - 1)
+    echo "data_dir,number of training images from imagenet,$times_augmented times augmented" > ${outputFiles[$i]}
 done
+# the number of images in each iteration
+numImagesFile=$scriptDir/output/${outputName}_numimages.csv
+num_images_header="data_dir,number of times augmented, ImageNet images"
+for categoryGroup in "${categoryGroups[@]}"
+do
+    num_images_header=$num_images_header,${categoryGroup}" augmented images"
+done
+echo $num_images_header > $numImagesFile
 
 for i in $(seq $numIterations)
 do
@@ -39,12 +49,15 @@ do
         python uncertain/getEmbeddingsForData.py $uptoiDir/ "" $uptoiDir/embeddings
         python uncertain/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $uptoiDir/embeddings
         rm $uptoiDir/embeddings
-        num_t0=$(ls -1 $uptoiDir/train/${categoryGroups[0]}/ | wc -l)
-        num_t1=$(ls -1 $uptoiDir/train/${categoryGroups[1]}/ | wc -l)
-        num_total=${num_t0}_${num_t1}
-        num_training=$(expr 2 \* $n)
-        num_str=${num_training}_${num_total}
-        python -m uncertain.learn $uptoiDir $num_str ${outputFiles[$i]} $model_output_folder
+        num_imagenet=$(expr 2 \* $n)
+        num_augmented_images=${uptoiDir},${num_imagenet}
+        for categoryGroup in "${categoryGroups[@]}"
+        do
+            num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroups}/ | wc -l)
+            num_augmented_images=$num_augmented_images,$num_in_category_group
+        done
+        echo $num_augmented_images > $numImagesFile
+        python -m uncertain.learn $uptoiDir $num_imagenet ${outputFiles[$i]} $model_output_folder
      done
 done
 

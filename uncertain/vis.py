@@ -8,7 +8,7 @@ numTrials = ['']
 pathToTrialsData = sys.argv[1]
 outputName = sys.argv[2]
 # a list of the run
-runTypes = ["1"]
+runTypes = ["1", "2", "3", "4"]
 
 allDFs = [[pd.read_csv(pathToTrialsData + str(x) + y + ".csv") for y in runTypes] for x in numTrials]
 
