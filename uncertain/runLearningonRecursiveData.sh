@@ -21,7 +21,7 @@ do
     outputFiles[$i]=$scriptDir/output/${outputName}_iter${i}.csv
     rm -f ${outputFiles[$i]}
     touch ${outputFiles[$i]}
-    times_augmented=$(expr i - 1)
+    times_augmented=$(expr $i - 1)
     echo "data_dir,number of training images from imagenet,$times_augmented times augmented" > ${outputFiles[$i]}
 done
 # the number of images in each iteration
@@ -50,7 +50,7 @@ do
         python uncertain/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $uptoiDir/embeddings
         rm $uptoiDir/embeddings
         num_imagenet=$(expr 2 \* $n)
-        num_augmented_images=${uptoiDir},${num_imagenet}
+        num_augmented_images=${uptoiDir},$(expr $i - 1),${num_imagenet}
         for categoryGroup in "${categoryGroups[@]}"
         do
             num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroups}/ | wc -l)
