@@ -55,7 +55,7 @@ do
         set -x
         for categoryGroup in "${categoryGroups[@]}"
         do
-            num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroups}/ | wc -l)
+            num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroup}/ | wc -l)
             num_augmented_images=$num_augmented_images,$num_in_category_group
         done
         set +x
