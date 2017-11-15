@@ -61,7 +61,6 @@ if [ $createDatasets == true ] && [ $createTrainVal == false ] ; then
     cp -r $images/valbackup $images/val
 fi
 
-idx=$(expr $i - 1)
 downloadedImages=$images/downloadedImages
 # remove all old training and validation copies of data
 rm -rf $downloadedImages
@@ -99,7 +98,7 @@ do
         if [ $j == 1 ]
         then
             set +x
-            python $scriptDir/imageCleaningAndGoogleSearching/scrape.py "${searchwords[$c]}" $nextIterDir/
+            python $scriptDir/imageCleaningAndGoogleSearching/textScrape.py "${searchwords[$c]}" $nextIterDir/
             set -x
         fi
         python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}" "${wrongwordFilters[$c]}"
