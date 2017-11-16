@@ -98,7 +98,7 @@ do
         if [ $j == 1 ]
         then
             set +x
-            python $scriptDir/imageCleaningAndGoogleSearching/textScrape.py "${searchwords[$c]}" $nextIterDir/
+            python $scriptDir/imageCleaningAndGoogleSearching/textScrape.py "${searchwords[$c]}" $curIterDir/
             set -x
         fi
         python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}" "${wrongwordFilters[$c]}"
