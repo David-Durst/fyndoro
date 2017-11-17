@@ -51,6 +51,9 @@ for dataPoint in dset:
     for region in regions:
         # cropBounds is in format left, top, width, height
         cropBoundsSelectSearch = region['rect']
+        # skip empty regions
+        if cropBoundsSelectSearch[2] == 0 or cropBoundsSelectSearch[3] == 0:
+            continue
         # cropCoordinates is in format left, upper, right, lower
         # which pillow's crop wants
         cropCoordinatesPillow = (cropBoundsSelectSearch[0], cropBoundsSelectSearch[1],
