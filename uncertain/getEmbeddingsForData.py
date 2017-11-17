@@ -68,6 +68,8 @@ for phase in ['train', 'val']:
     for data in dsets[phase]:
         #print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
         inputs, labelIndices = data
+        # this is used to add an extra dimension in the tensor
+        # as the model is expecting multiple images
         inputs = inputs.unsqueeze(0)
         # wrap them in Variable
         if use_gpu:
