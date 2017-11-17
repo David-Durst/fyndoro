@@ -41,6 +41,8 @@ model.fc = nn.Linear(num_ftrs, 2)
 if model_input_location != "":
     model.load_state_dict(torch.load(model_input_location))
 
+model = model.cuda()
+
 outputs = []
 for dataPoint in dset:
     #print("Working on element " + str(i) + " of " + phaseLen + " in phase " + phase)
