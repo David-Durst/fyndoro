@@ -72,7 +72,7 @@ for dataPoint in dset:
         if region['size'] < 2000:
             continue
 
-        imageRegion = cropImageUsingBounds(region['rect'])
+        imageRegion = cropImageUsingBounds(image, region['rect'])
         imageAsTensorForEval = data_transforms(imageRegion)
         imageRegionsAsTensors.append(imageAsTensorForEval)
 
