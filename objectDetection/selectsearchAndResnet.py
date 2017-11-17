@@ -65,7 +65,7 @@ for dataPoint in dset:
     # just using default parameters, will tune later
     img_lbl, unfilteredRegions = selectivesearch.selective_search(numpy.asarray(image), scale=500, sigma=0.9, min_size=10)
     # make sure regions are reasonably sized
-    regions = [r for r in unfilteredRegions if region['rect'][2] > 10 and region['rect'][3] > 10 and region['size'] >= 2000]
+    regions = [r for r in unfilteredRegions if r['rect'][2] > 10 and r['rect'][3] > 10 and r['size'] >= 2000]
     imageRegionsAsTensors = []
     for region in regions:
         imageRegion = cropImageUsingBounds(image, region['rect'])
