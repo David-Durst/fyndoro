@@ -99,6 +99,7 @@ do
         then
             set +x
             python $scriptDir/imageCleaningAndGoogleSearching/textScrape.py "${searchwords[$c]}" $curIterDir/
+            python $scriptDir/imageCleaningAndGoogleSearching/clean.py $nextIterDir/
             set -x
         fi
         python $scriptDir/imageCleaningAndGoogleSearching/scrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}" "${wrongwordFilters[$c]}"

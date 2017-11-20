@@ -33,9 +33,10 @@ do
 done
 echo $num_images_header > $numImagesFile
 
+model_output_folder=()
 for i in $(seq $numIterations)
 do
-    model_output_folder=$scriptDir/${outputName}Models_${i}
+    model_output_folder[$i]=$scriptDir/${outputName}Models_${i}
     rm -rf $model_output_folder
     mkdir -p $model_output_folder
 done
@@ -50,9 +51,9 @@ do
         python uncertain/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $uptoiDir/embeddings
         rm $uptoiDir/embeddings
         num_imagenet=$(expr 2 \* $n)
-        python -m uncertain.learn $uptoiDir $num_imagenet ${outputFiles[$i]} $model_output_folder
-        num_augmented_images=${uptoiDir},$(expr $i - 1),${num_imagenet}
         set -x
+        python -m uncertain.learn $uptoiDir $num_imagenet ${outputFiles[$i]} ${model_output_folder[$i]}
+        num_augmented_images=${uptoiDir},$(expr $i - 1),${num_imagenet}
         for categoryGroup in "${categoryGroups[@]}"
         do
             num_in_category_group=$(ls -1 $uptoiDir/train/${categoryGroup}/ | wc -l)
