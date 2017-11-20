@@ -56,9 +56,13 @@ with Browser() as browser:
                 continue
             elif scrapeKeywords != False:
                 pageHTML = browser.html.lower()
-                if all(keyword in pageHTML for keyword in scrapeKeywords) and not \
-                        any(wrongWord in pageHTML for wrongWord in scrapeWrongwords):
-                    print("skipping image " + str(numDownloaded - 1) + " as matches no keywords in description", flush=True)
+                if not all(keyword in pageHTML for keyword in scrapeKeywords):
+                    print("skipping image " + str(numDownloaded - 1) + " as matches not all keywords in description",
+                          flush=True)
+                    print(browser.url, flush=True)
+                    continue
+                elif any(wrongWord in pageHTML for wrongWord in scrapeWrongwords):
+                    print("skipping image " + str(numDownloaded - 1) + " as matches wrongwords in description", flush=True)
                     print(browser.url, flush=True)
                     continue
                 else:
