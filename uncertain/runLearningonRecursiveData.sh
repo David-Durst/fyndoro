@@ -37,8 +37,8 @@ model_output_folder=()
 for i in $(seq $numIterations)
 do
     model_output_folder[$i]=$scriptDir/${outputName}Models_${i}
-    rm -rf $model_output_folder
-    mkdir -p $model_output_folder
+    rm -rf ${model_output_folder[$i]}
+    mkdir -p ${model_output_folder[$i]}
 done
 
 for n in "${numImages[@]}"
