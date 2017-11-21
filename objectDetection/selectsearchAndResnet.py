@@ -60,7 +60,7 @@ outputs = []
 i = 0
 numPoints = str(len(dset))
 for dataPoint in dset:
-    print("Working on element " + str(i) + " of " + numPoints)
+    print("Working on element " + str(i) + " of " + numPoints, flush=True)
     image, labelIndices = dataPoint
     # just using default parameters, will tune later
     img_lbl, unfilteredRegions = selectivesearch.selective_search(numpy.asarray(image), scale=500, sigma=0.9, min_size=10)
