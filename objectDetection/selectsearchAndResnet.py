@@ -59,9 +59,14 @@ def cropImageUsingBounds(image, bounds):
 outputs = []
 i = 0
 numPoints = str(len(dset))
+numSkipped = 0
+numClass0Right = 0
+numClass0Wrong = 0
+numClass1Right = 0
+numClass1Wrong = 0
 for dataPoint in dset:
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
-    image, labelIndices = dataPoint
+    image, labelIndex = dataPoint
     # just using default parameters, will tune later
     img_lbl, unfilteredRegions = selectivesearch.selective_search(numpy.asarray(image), scale=500, sigma=0.9, min_size=10)
     # make sure regions are reasonably sized
@@ -95,9 +100,10 @@ for dataPoint in dset:
     # first [0] gives the probabilities of the boxes that are most likely to be in each class. skip if both max probabilities < 0.9
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
+    print("image " + fileName + " is class " + str(labelIndex))
     if mostLikely[0][0] < 0.9 and mostLikely[0][1] < 0.9:
         print("dropping image " + fileName + " as most likely object was: " + str(mostLikely[0]))
-        continue
+        numSkipped += 1
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
     if mostLikely[0][0] > 0.9:
@@ -105,8 +111,32 @@ for dataPoint in dset:
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
         cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class0 + "/" + fileName)
+        if labelIndex == 0:
+            numClass0Right += 1
+            cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(
+                output_dir_class0 + "/right/" + fileName)
+        else:
+            numClass0Wrong += 1
+            cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(
+                output_dir_class0 + "/wrong/" + fileName)
     if mostLikely[0][1] > 0.9:
         print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][1]
         cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class1 + "/" + fileName)
+        if labelIndex == 1:
+            numClass1Right += 1
+            cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(
+                output_dir_class1 + "/right/" + fileName)
+        else:
+            numClass1Wrong += 1
+            cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(
+                output_dir_class1 + "/wrong/" + fileName)
+    print("percent right: " + str((numClass0Right + numClass1Right)/i))
+    print("percent wrong: " + str((numClass0Wrong + numClass1Wrong)/i))
+    print("percent skipped: " + str(numSkipped / i))
+    print("class 0 right: " + str(numClass0Right))
+    print("class 0 wrong: " + str(numClass0Wrong))
+    print("class 1 right: " + str(numClass1Right))
+    print("class 1 wrong: " + str(numClass1Wrong))
+    print("skipped: " + str(numSkipped))
