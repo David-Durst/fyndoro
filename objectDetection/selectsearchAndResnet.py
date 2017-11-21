@@ -66,7 +66,10 @@ for dataPoint in dset:
     # just using default parameters, will tune later
     img_lbl, unfilteredRegions = selectivesearch.selective_search(numpy.asarray(image), scale=500, sigma=0.9, min_size=10)
     # make sure regions are reasonably sized
-    regions = [r for r in unfilteredRegions if r['rect'][2] > 10 and r['rect'][3] > 10 and r['size'] >= 2000]
+    smallSizeFilteredRegions = [r for r in unfilteredRegions if r['rect'][2] > 10 and r['rect'][3] > 10 and r['size'] >= 2000]
+    # only take 200 biggest regions, don't want to flood the gpu ram
+    regions = sorted(smallSizeFilteredRegions, key = lambda k: k['size'], reverse=True)[:200]
+
     imageRegionsAsTensors = []
     for region in regions:
         imageRegion = cropImageUsingBounds(image, region['rect'])
@@ -74,6 +77,7 @@ for dataPoint in dset:
         imageRegionsAsTensors.append(imageAsTensorForEval)
 
     imageRegionsAsOneTensor = torch.stack(imageRegionsAsTensors)
+    print(str(imageRegionsAsOneTensor.size()))
     # wrap them in Variable
     if use_gpu:
         inputs = Variable(imageRegionsAsOneTensor.cuda())
