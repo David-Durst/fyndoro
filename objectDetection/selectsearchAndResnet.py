@@ -61,7 +61,6 @@ i = 0
 numPoints = str(len(dset))
 for dataPoint in dset:
     print("Working on element " + str(i) + " of " + numPoints)
-    i += 1
     image, labelIndices = dataPoint
     # just using default parameters, will tune later
     img_lbl, unfilteredRegions = selectivesearch.selective_search(numpy.asarray(image), scale=500, sigma=0.9, min_size=10)
@@ -91,19 +90,22 @@ for dataPoint in dset:
     # dimension fo tensor, which is max probability of being in
     # each category
     mostLikely = classProbabilityTensor.max(0)
+    fileName = os.path.basename(dset.imgs[i][0])
+    i += 1
     # first [0] gives the probabilities. skip if p < 0.9
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
     if mostLikely[0][0] < 0.9 and mostLikely[0][0] > 0.1:
+        print("dropping image " + fileName + " as most likely object was: " + str(mostLikely[0]))
         continue
     # write to the folder for class 0 or 1 depending on which is most likely
     elif mostLikely[0][0] > 0.9:
+        print("think image " + fileName + " is class 0 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
-        fileName = os.path.basename(dset.imgs[i][0])
         cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class0 + "/" + fileName)
     else:
+        print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][1]
-        fileName = os.path.basename(dset.imgs[i][1])
         cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class1 + "/" + fileName)
