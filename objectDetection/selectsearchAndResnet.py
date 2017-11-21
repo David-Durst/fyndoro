@@ -92,19 +92,20 @@ for dataPoint in dset:
     mostLikely = classProbabilityTensor.max(0)
     fileName = os.path.basename(dset.imgs[i][0])
     i += 1
-    # first [0] gives the probabilities. skip if p < 0.9
+    # first [0] gives the probabilities of the boxes that are most likely to be in each class. skip if both max probabilities < 0.9
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
-    if mostLikely[0][0] < 0.9 and mostLikely[0][0] > 0.1:
+    if mostLikely[0][0] < 0.9 and mostLikely[0][1] < 0.9:
         print("dropping image " + fileName + " as most likely object was: " + str(mostLikely[0]))
         continue
     # write to the folder for class 0 or 1 depending on which is most likely
-    elif mostLikely[0][0] > 0.9:
+    # if likely to be in both classes, write to both
+    if mostLikely[0][0] > 0.9:
         print("think image " + fileName + " is class 0 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
         cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class0 + "/" + fileName)
-    else:
+    if mostLikely[0][1] > 0.9:
         print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][1]
