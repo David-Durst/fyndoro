@@ -16,7 +16,8 @@ import json
 data_dir = sys.argv[1]
 # if this is empty, the default model will be used
 model_input_location = sys.argv[2]
-output_dir = sys.argv[3]
+output_dir_class0 = sys.argv[3]
+output_dir_class1 = sys.argv[4]
 
 # Data augmentation and normalization for training
 # do transforms that are normally just for validation
@@ -87,11 +88,18 @@ for dataPoint in dset:
     # each category
     mostLikely = classProbabilityTensor.max(0)
     # first [0] gives the probabilities. skip if p < 0.9
-    # second [0] gives the index of the element with the max probability
+    # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
-    if mostLikely[0][0] < 0.9:
+    if mostLikely[0][0] < 0.9 and mostLikely[0][0] > 0.1:
         continue
-    # [1] gives the indices instead of the probabilities
-    indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
-    fileName = os.path.basename(dset.imgs[i][0])
-    cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir + "/" + fileName)
+    # write to the folder for class 0 or 1 depending on which is most likely
+    elif mostLikely[0][0] > 0.9:
+        # [1] gives the indices instead of the probabilities
+        indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
+        fileName = os.path.basename(dset.imgs[i][0])
+        cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class0 + "/" + fileName)
+    else:
+        # [1] gives the indices instead of the probabilities
+        indexOfMostLikely = classProbabilityTensor.max(0)[1][1]
+        fileName = os.path.basename(dset.imgs[i][1])
+        cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(output_dir_class1 + "/" + fileName)
