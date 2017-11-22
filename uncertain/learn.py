@@ -73,6 +73,7 @@ dset_loaders['val'] = torch.utils.data.DataLoader(dsets['val'], batch_size=15, s
 #                for x in ['train', 'val']}
 dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
 dset_classes = dsets['train'].classes
+print("Classes to index mapping is" + str([(i, c) for i, c in enumerate(dset_classes)]))
 
 use_gpu = torch.cuda.is_available()
 
