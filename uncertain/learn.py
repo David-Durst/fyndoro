@@ -9,6 +9,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 import torchvision
 from torchvision import datasets, models, transforms
+import torchsample
 import numpy as np
 import time
 import copy
@@ -29,6 +30,7 @@ data_transforms = {
         transforms.RandomSizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
+        torchsample.transforms.RandomAffine(90, (0.5, 0.5), 90),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'val': transforms.Compose([
