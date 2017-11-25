@@ -16,3 +16,4 @@ output/
 IMAGENET_API_KEY
 entertainerOrCandidate
 *.log
+*.torch
