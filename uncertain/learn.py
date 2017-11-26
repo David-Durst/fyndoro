@@ -181,7 +181,7 @@ model_ft = models.resnet18(pretrained=True)
 #for param in model_ft.parameters():
 #    param.requires_grad = False
 num_ftrs = model_ft.fc.in_features
-model_ft.fc = nn.Linear(num_ftrs, 2)
+model_ft.fc = nn.Linear(num_ftrs, len(dset_classes))
 
 if use_gpu:
     model_ft = model_ft.cuda()

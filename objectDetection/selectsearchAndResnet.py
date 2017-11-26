@@ -106,7 +106,7 @@ for dataPoint in dset:
         numSkipped += 1
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
-    if mostLikely[0][0] > 0.9:
+    if mostLikely[0][0] > 0.7:
         print("think image " + fileName + " is class 0 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
@@ -119,7 +119,7 @@ for dataPoint in dset:
             numClass0Wrong += 1
             cropImageUsingBounds(image, regions[indexOfMostLikely]['rect']).save(
                 output_dir_class0 + "/wrong/" + fileName)
-    if mostLikely[0][1] > 0.9:
+    if mostLikely[0][1] > 0.7:
         print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
         indexOfMostLikely = classProbabilityTensor.max(0)[1][1]

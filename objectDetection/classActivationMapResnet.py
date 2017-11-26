@@ -17,14 +17,12 @@ model_input_location = sys.argv[1]
 input_image = sys.argv[2]
 label_map = sys.argv[3]
 desired_label_index = int(sys.argv[4])
-output_location = sys.argv[4]
-
 
 net = models.resnet18(pretrained=True)
 #for param in model.parameters():
 #    param.requires_grad = False
 num_ftrs = net.fc.in_features
-net.fc = nn.Linear(num_ftrs, 2)
+net.fc = nn.Linear(num_ftrs, 3)
 # if model_input_location is empty, use default weights
 if model_input_location != "":
     # https://discuss.pytorch.org/t/on-a-cpu-device-how-to-load-checkpoint-saved-on-gpu-device/349/3
@@ -84,7 +82,7 @@ h_x = F.softmax(logit).data.squeeze()
 probs, idx = h_x.sort(0, True)
 
 # output the prediction
-for i in range(0, 2):
+for i in range(0, 3):
     print('{:.3f} -> {}'.format(probs[i], classes[idx[i]]))
 
 # generate class activation mapping for the top1 prediction
