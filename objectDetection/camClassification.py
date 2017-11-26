@@ -19,6 +19,9 @@ model_input_location = sys.argv[2]
 output_dir_class0 = sys.argv[3]
 output_dir_class1 = sys.argv[4]
 
+# how likely must a category be for it to be chosen
+categoryThreshold = 0.5
+
 # Data augmentation and normalization for training
 # do transforms that are normally just for validation
 # for all data
@@ -37,7 +40,7 @@ model = models.resnet18(pretrained=True)
 #for param in model.parameters():
 #    param.requires_grad = False
 num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, 2)
+model.fc = nn.Linear(num_ftrs, 3)
 # if model_input_location is empty, use default weights
 if model_input_location != "":
     model.load_state_dict(torch.load(model_input_location))
@@ -77,28 +80,21 @@ for dataPoint in dset:
     else:
         inputs = Variable(inputs)
     # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
-    classProbabilityTensor = F.softmax(model(inputs)).data
-    # take the region with the max probability of being the desired
-    # class
-    # max(0) gives the indices and values of the max in the first
-    # dimension fo tensor, which is max probability of being in
-    # each category
-    mostLikely = classProbabilityTensor.max(0)
+    classProbabilities = F.softmax(model(inputs)).data[0]
     fileName = os.path.basename(dset.imgs[i][0])
     i += 1
     # first [0] gives the probabilities of the boxes that are most likely to be in each class. skip if both max probabilities < 0.9
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
     print("image " + fileName + " is class " + str(labelIndex))
-    if mostLikely[0][0] < 0.9 and mostLikely[0][1] < 0.9:
+    if classProbabilities[0] < categoryThreshold and classProbabilities[1] < categoryThreshold:
         print("dropping image " + fileName + " as most likely object was: " + str(mostLikely[0]))
         numSkipped += 1
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
-    if mostLikely[0][0] > 0.7:
+    if classProbabilities[0] > categoryThreshold:
         print("think image " + fileName + " is class 0 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
-        indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
         image.save(output_dir_class0 + "/" + fileName)
         if labelIndex == 0:
             numClass0Right += 1
@@ -106,10 +102,9 @@ for dataPoint in dset:
         else:
             numClass0Wrong += 1
             image.save(output_dir_class0 + "/wrong/" + fileName)
-    if mostLikely[0][1] > 0.7:
+    if classProbabilities[1] > categoryThreshold:
         print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
         # [1] gives the indices instead of the probabilities
-        indexOfMostLikely = classProbabilityTensor.max(0)[1][1]
         image.save(output_dir_class1 + "/" + fileName)
         if labelIndex == 1:
             numClass1Right += 1
