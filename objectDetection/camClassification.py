@@ -87,13 +87,14 @@ for dataPoint in dset:
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
     print("image " + fileName + " is class " + str(labelIndex))
+    print("probabilites are " + str(classProbabilities))
     if classProbabilities[0] < categoryThreshold and classProbabilities[1] < categoryThreshold:
-        print("dropping image " + fileName + " as most likely object was: " + str(mostLikely[0]))
+        print("dropping image " + fileName + " as probabilites were all less than " + str(categoryThreshold))
         numSkipped += 1
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
     if classProbabilities[0] > categoryThreshold:
-        print("think image " + fileName + " is class 0 as most likely object was: " + str(mostLikely[0]))
+        print("think image " + fileName + " is class 0 as its probability was was: " + str(categoryThreshold[0]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class0 + "/" + fileName)
         if labelIndex == 0:
@@ -103,7 +104,7 @@ for dataPoint in dset:
             numClass0Wrong += 1
             image.save(output_dir_class0 + "/wrong/" + fileName)
     if classProbabilities[1] > categoryThreshold:
-        print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
+        print("think image " + fileName + " is class 1 as its probability was: " + str(categoryThreshold[1]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class1 + "/" + fileName)
         if labelIndex == 1:
