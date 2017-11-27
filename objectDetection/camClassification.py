@@ -1,7 +1,4 @@
-from PIL import Image
-import selectivesearch
-import numpy
-
+from objectDetection.classActivationMapResnet import generateCamClassificationHeatmap
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,6 +15,7 @@ data_dir = sys.argv[1]
 model_input_location = sys.argv[2]
 output_dir_class0 = sys.argv[3]
 output_dir_class1 = sys.argv[4]
+label_map = sys.argv[5]
 
 # how likely must a category be for it to be chosen
 categoryThreshold = 0.5
@@ -67,6 +65,12 @@ numClass0Right = 0
 numClass0Wrong = 0
 numClass1Right = 0
 numClass1Wrong = 0
+os.system("mkdir -p " + output_dir_class0 + "/right/")
+os.system("mkdir -p " + output_dir_class0 + "/wrong/")
+os.system("mkdir -p " + output_dir_class0 + "/heatmap/")
+os.system("mkdir -p " + output_dir_class1 + "/right/")
+os.system("mkdir -p " + output_dir_class1 + "/wrong/")
+os.system("mkdir -p " + output_dir_class1 + "/heatmap/")
 for dataPoint in dset:
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
     image, labelIndex = dataPoint
@@ -97,6 +101,9 @@ for dataPoint in dset:
         print("think image " + fileName + " is class 0 as its probability was was: " + str(categoryThreshold[0]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class0 + "/" + fileName)
+        #make the cam heatmap for this class
+        generateCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
+                                         output_dir_class0 + "/heatmap/" + fileName, label_map, 0)
         if labelIndex == 0:
             numClass0Right += 1
             image.save(output_dir_class0 + "/right/" + fileName)
@@ -107,6 +114,8 @@ for dataPoint in dset:
         print("think image " + fileName + " is class 1 as its probability was: " + str(categoryThreshold[1]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class1 + "/" + fileName)
+        generateCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
+                                         output_dir_class0 + "/heatmap/" + fileName, label_map, 1)
         if labelIndex == 1:
             numClass1Right += 1
             image.save(output_dir_class1 + "/right/" + fileName)
