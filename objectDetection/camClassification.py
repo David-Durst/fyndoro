@@ -114,8 +114,8 @@ for dataPoint in dset:
         print("think image " + fileName + " is class 1 as its probability was: " + str(classProbabilities[1]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class1 + "/" + fileName)
-        generateCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
-                                         output_dir_class0 + "/heatmap/" + fileName, label_map, 1)
+        generateCamClassificationHeatmap(model_input_location, output_dir_class1 + "/" + fileName,
+                                         output_dir_class1 + "/heatmap/" + fileName, label_map, 1)
         if labelIndex == 1:
             numClass1Right += 1
             image.save(output_dir_class1 + "/right/" + fileName)
