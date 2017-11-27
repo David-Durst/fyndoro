@@ -65,7 +65,7 @@ def generateCamClassificationHeatmap(model_input_location, input_image, label_ma
        normalize
     ])
 
-    img_pil = Image.open(input_image)
+    img_pil = Image.fromarray(cv2.cvtColor(input_image,cv2.COLOR_BGR2RGB))
     img_tensor = preprocess(img_pil)
     img_variable = Variable(img_tensor.unsqueeze(0))
     logit = net(img_variable)
@@ -86,11 +86,10 @@ def generateCamClassificationHeatmap(model_input_location, input_image, label_ma
 
     # render the CAM and output
     print('showing heatmap for label %s'%classes[desired_label_index])
-    img = cv2.imread(input_image)
-    height, width, _ = img.shape
+    height, width, _ = input_image.shape
     grayscaleHeatmap = cv2.resize(CAMs[0],(width, height))
     heatmap = cv2.applyColorMap(grayscaleHeatmap, cv2.COLORMAP_JET)
-    return (grayscaleHeatmap, img, heatmap * 0.3 + img * 0.5)
+    return (grayscaleHeatmap, input_image, heatmap * 0.3 + input_image * 0.5)
 
 def getLargestConnectComponentAsPILImage(model_input_location, input_image, label_map, desired_label_index):
     grayscaleHeatmap, img, result = generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index)
@@ -125,7 +124,8 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     return Image.fromarray(cv2.cvtColor(largestConnectedComponent,cv2.COLOR_BGR2RGB))
 
 
-def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index):
+def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_image, label_map, desired_label_index):
+    input_image = cv2.imread(input_image_location)
     _, _, result = generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index)
     cv2.imwrite(output_image, result)
 

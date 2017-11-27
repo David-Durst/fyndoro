@@ -1,4 +1,4 @@
-from objectDetection.classActivationMapResnet import makeAndSaveToFileCamClassificationHeatmap
+from objectDetection.classActivationMapResnet import getLargestConnectComponentAsPILImage
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -7,6 +7,8 @@ from torchvision import datasets, models, transforms
 import torch.nn.functional as F
 import sys
 import os
+import numpy as np
+import cv2
 import json
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
@@ -73,8 +75,11 @@ os.system("mkdir -p " + output_dir_class1 + "/wrong/")
 os.system("mkdir -p " + output_dir_class1 + "/heatmap/")
 for dataPoint in dset:
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
-    image, labelIndex = dataPoint
-
+    pil_image, labelIndex = dataPoint
+    # https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
+    cvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+    subsetOfImageClass0 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 0)
+    subsetOfImageClass1 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 1)
     # this is used to add an extra dimension in the tensor
     # as the model is expecting multiple images
     inputs = data_transforms(image).unsqueeze(0)
