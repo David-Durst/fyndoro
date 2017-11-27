@@ -88,9 +88,9 @@ for dataPoint in dset:
     imageRegionsAsOneTensor = torch.stack(imageRegionsAsTensors)
     # wrap them in Variable
     if use_gpu:
-        inputs = Variable(inputs.cuda())
+        inputs = Variable(imageRegionsAsOneTensor.cuda())
     else:
-        inputs = Variable(inputs)
+        inputs = Variable(imageRegionsAsOneTensor)
     # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
     classProbabilityTensor = F.softmax(model(inputs)).data
     # take the region with the max probability of being the desired
