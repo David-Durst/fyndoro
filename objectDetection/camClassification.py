@@ -1,4 +1,4 @@
-from objectDetection.classActivationMapResnet import getLargestConnectComponentAsPILImage
+from objectDetection.classActivationMapResnet import makeAndSaveToFileCamClassificationHeatmap, getLargestConnectComponentAsPILImage
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -20,7 +20,7 @@ output_dir_class1 = sys.argv[4]
 label_map = sys.argv[5]
 
 # how likely must a category be for it to be chosen
-categoryThreshold = 0.5
+categoryThreshold = 0.9
 
 # Data augmentation and normalization for training
 # do transforms that are normally just for validation
@@ -78,55 +78,66 @@ for dataPoint in dset:
     pil_image, labelIndex = dataPoint
     # https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
     cvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
-    subsetOfImageClass0 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 0)
-    subsetOfImageClass1 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 1)
-    # this is used to add an extra dimension in the tensor
-    # as the model is expecting multiple images
-    inputs = data_transforms(image).unsqueeze(0)
+    imageRegionsClass0 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 0)
+    imageRegionsClass1 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 1)
+    imageRegions = imageRegionsClass0 + imageRegionsClass1
+    imageRegionsAsTensors = []
+    for imageRegion in imageRegions:
+        imageAsTensorForEval = data_transforms(imageRegion)
+        imageRegionsAsTensors.append(imageAsTensorForEval)
+    imageRegionsAsOneTensor = torch.stack(imageRegionsAsTensors)
     # wrap them in Variable
     if use_gpu:
         inputs = Variable(inputs.cuda())
     else:
         inputs = Variable(inputs)
     # based on __getitem__ implementation of datasets.ImageLoader, imgs index matches that of items
-    classProbabilities = F.softmax(model(inputs)).data[0]
+    classProbabilityTensor = F.softmax(model(inputs)).data
+    # take the region with the max probability of being the desired
+    # class
+    # max(0) gives the indices and values of the max in the first
+    # dimension fo tensor, which is max probability of being in
+    # each category
+    mostLikely = classProbabilityTensor.max(0)
     fileName = os.path.basename(dset.imgs[i][0])
     i += 1
-    # first [0] gives the probabilities of the boxes that are most likely to be in each class. skip if both max probabilities < 0.9
+    # in mostLikely, first [0] gives the probabilities of the boxes that are most likely to be in each class. skip if both max probabilities < 0.9
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
     print("image " + fileName + " is class " + str(labelIndex))
-    print("probabilites are " + str(classProbabilities))
-    if classProbabilities[0] < categoryThreshold and classProbabilities[1] < categoryThreshold:
+    print("max probabilites are " + str(mostLikely[0]))
+    if mostLikely[0][0] < categoryThreshold and mostLikely[0][1] < categoryThreshold:
         print("dropping image " + fileName + " as probabilites were all less than " + str(categoryThreshold))
         numSkipped += 1
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
-    if classProbabilities[0] > categoryThreshold:
-        print("think image " + fileName + " is class 0 as its probability was was: " + str(classProbabilities[0]))
+    if mostLikely[0][0] > categoryThreshold:
+        print("think image " + fileName + " is class 0 as most likely object was: " + str(mostLikely[0]))
+        indexOfMostLikely = classProbabilityTensor.max(0)[1][0]
         # [1] gives the indices instead of the probabilities
-        image.save(output_dir_class0 + "/" + fileName)
+        pil_image.save(output_dir_class0 + "/" + fileName)
         #make the cam heatmap for this class
         makeAndSaveToFileCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
                                          output_dir_class0 + "/heatmap/" + fileName, label_map, 0)
         if labelIndex == 0:
             numClass0Right += 1
-            image.save(output_dir_class0 + "/right/" + fileName)
+            imageRegions[indexOfMostLikely].save(output_dir_class0 + "/right/" + fileName)
         else:
             numClass0Wrong += 1
-            image.save(output_dir_class0 + "/wrong/" + fileName)
-    if classProbabilities[1] > categoryThreshold:
-        print("think image " + fileName + " is class 1 as its probability was: " + str(classProbabilities[1]))
+            imageRegions[indexOfMostLikely].save(output_dir_class0 + "/wrong/" + fileName)
+    if mostLikely[0][1] > categoryThreshold:
+        print("think image " + fileName + " is class 1 as most likely object was: " + str(mostLikely[0]))
+        indexOfMostLikely = classProbabilityTensor.max(0)[1][1]
         # [1] gives the indices instead of the probabilities
-        image.save(output_dir_class1 + "/" + fileName)
+        pil_image.save(output_dir_class1 + "/" + fileName)
         makeAndSaveToFileCamClassificationHeatmap(model_input_location, output_dir_class1 + "/" + fileName,
                                          output_dir_class1 + "/heatmap/" + fileName, label_map, 1)
         if labelIndex == 1:
             numClass1Right += 1
-            image.save(output_dir_class1 + "/right/" + fileName)
+            imageRegions[indexOfMostLikely].save(output_dir_class1 + "/right/" + fileName)
         else:
             numClass1Wrong += 1
-            image.save(output_dir_class1 + "/wrong/" + fileName)
+            imageRegions[indexOfMostLikely].save(output_dir_class1 + "/wrong/" + fileName)
     print("percent right: " + str((numClass0Right + numClass1Right)/i))
     print("percent wrong: " + str((numClass0Wrong + numClass1Wrong)/i))
     print("percent skipped: " + str(numSkipped / i))

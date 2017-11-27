@@ -111,17 +111,20 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     # give up and take any region if none good enough
     if len(aboveThresholdStats) == 0:
         aboveThresholdStats = statsSorted
+    imgsToReturn = []
     # already sorted, so 0 gets largest
-    # object is of form leftmost x, topmost y, wigth, height, size
-    x, y, width, height, size = aboveThresholdStats[0]
-    # not that 0,0 is top left in opencv
-    # taking subset of image in bounding box
-    largestConnectedComponent = img[x:(x + width), y:(y+height)]
-    # https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html#imread
-    # that shows that default color scheme is BGR, not RGB
-    # https://stackoverflow.com/questions/13576161/convert-opencv-image-into-pil-image-in-python-for-use-with-zbar-library
-    # that provides how to do conversion
-    return Image.fromarray(cv2.cvtColor(largestConnectedComponent,cv2.COLOR_BGR2RGB))
+    for regionStat in aboveThresholdStats:
+        # object is of form leftmost x, topmost y, wigth, height, size
+        x, y, width, height, size = aboveThresholdStats[0]
+        # note that 0,0 is top left in opencv
+        # taking subset of image in bounding box
+        connectedComponentImg = img[x:(x + width), y:(y+height)]
+        # https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html#imread
+        # that shows that default color scheme is BGR, not RGB
+        # https://stackoverflow.com/questions/13576161/convert-opencv-image-into-pil-image-in-python-for-use-with-zbar-library
+        # that provides how to do conversion
+        imgsToReturn.append(Image.fromarray(cv2.cvtColor(connectedComponentImg,cv2.COLOR_BGR2RGB)))
+    return imgsToReturn
 
 
 def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_image, label_map, desired_label_index):
