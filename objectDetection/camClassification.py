@@ -1,4 +1,4 @@
-from objectDetection.classActivationMapResnet import generateCamClassificationHeatmap
+from objectDetection.classActivationMapResnet import makeAndSaveToFileCamClassificationHeatmap
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -102,7 +102,7 @@ for dataPoint in dset:
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class0 + "/" + fileName)
         #make the cam heatmap for this class
-        generateCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
+        makeAndSaveToFileCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
                                          output_dir_class0 + "/heatmap/" + fileName, label_map, 0)
         if labelIndex == 0:
             numClass0Right += 1
@@ -114,7 +114,7 @@ for dataPoint in dset:
         print("think image " + fileName + " is class 1 as its probability was: " + str(classProbabilities[1]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class1 + "/" + fileName)
-        generateCamClassificationHeatmap(model_input_location, output_dir_class1 + "/" + fileName,
+        makeAndSaveToFileCamClassificationHeatmap(model_input_location, output_dir_class1 + "/" + fileName,
                                          output_dir_class1 + "/heatmap/" + fileName, label_map, 1)
         if labelIndex == 1:
             numClass1Right += 1

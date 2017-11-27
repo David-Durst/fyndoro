@@ -89,8 +89,30 @@ def generateCamClassificationHeatmap(model_input_location, input_image, output_i
     img = cv2.imread(input_image)
     height, width, _ = img.shape
     heatmap = cv2.applyColorMap(cv2.resize(CAMs[0],(width, height)), cv2.COLORMAP_JET)
-    result = heatmap * 0.3 + img * 0.5
+    return (heatmap, img, heatmap * 0.3 + img * 0.5)
+
+def makeAndSaveLargestConnectComponent(model_input_location, input_image, output_image, label_map, desired_label_index):
+    heatmap, img, result = generateCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index)
+    # https://stackoverflow.com/questions/35854197/how-to-use-opencvs-connected-components-with-stats-in-python
+    # not that cv2.THRESH_BINARY and cv2.THRESH_OTSU are flags, binary says binary thresholding (i think)
+    # otsu automatically figures out the best global thresholding
+    # https://docs.opencv.org/3.3.1/d7/d4d/tutorial_py_thresholding.html
+    ret, thresh = cv2.threshold(heatmap, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    connectivity = 8
+    output = cv2.connectedComponentsWithStats(thresh, connectivity, cv2.CV_32S)
+    num_labels, labels, stats, centroids = output
+    # fifth element of each element in stats is size, so getting max of those
+    largestConnectedComponentIndex = np.argsort(stats[:,4])[-2]
+    x, y, width, height, size = stats[largestConnectedComponentIndex]
+    # object is of form leftmost x, topmost y, wigth, height, size
+    # not that 0,0 is top left in opencv
+    # taking subset of image in bounding box
+    largestConnectedComponent = img[x:(x + width), y:(y+height)]
+
+
+def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index):
+    _, _, result = generateCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index)
     cv2.imwrite(output_image, result)
 
 if __name__ == "__main__":
-    generateCamClassificationHeatmap(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))
+    makeAndSaveToFileCamClassificationHeatmap(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))
