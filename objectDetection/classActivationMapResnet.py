@@ -91,8 +91,9 @@ def generateCamClassificationHeatmap(model_input_location, input_image, label_ma
     heatmap = cv2.applyColorMap(grayscaleHeatmap, cv2.COLORMAP_JET)
     return (grayscaleHeatmap, input_image, heatmap * 0.3 + input_image * 0.5)
 
-def getLargestConnectComponentAsPILImage(model_input_location, input_image, label_map, desired_label_index):
-    grayscaleHeatmap, img, result = generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index)
+def getConnectedComponentsAndImgData(model_input_location, input_image, label_map, desired_label_index):
+    grayscaleHeatmap, img, imgAndColorHeatmap = generateCamClassificationHeatmap(model_input_location, input_image, label_map,
+                                                                     desired_label_index)
     # https://stackoverflow.com/questions/35854197/how-to-use-opencvs-connected-components-with-stats-in-python
     # not that cv2.THRESH_BINARY and cv2.THRESH_OTSU are flags, binary says binary thresholding (i think)
     # otsu automatically figures out the best global thresholding
@@ -103,7 +104,11 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     num_labels, labels, stats, centroids = output
     # sort stats so one with largest area comes first
     # fifth element of each element in stats is size, so getting largest of those
-    statsSorted = stats[np.argsort(stats[:,4])[::-1]]
+    statsSorted = stats[np.argsort(stats[:, 4])[::-1]]
+    return (statsSorted, thresh, grayscaleHeatmap, img, imgAndColorHeatmap)
+
+def getLargestConnectComponentAsPILImage(model_input_location, input_image, label_map, desired_label_index):
+    statsSorted, thresh, grayscaleHeatmap, img, _ = getConnectedComponentsAndImgData(model_input_location, input_image, label_map, desired_label_index)
     # filter out regions that aren't greater than average by at least 20
     # meaning at some significant part of region above threshold
     meanPixelValue = np.mean(thresh)
@@ -129,8 +134,17 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
 
 def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_image, label_map, desired_label_index):
     input_image = cv2.imread(input_image_location)
-    _, _, result = generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index)
-    cv2.imwrite(output_image, result)
+    statsSorted, thresh, _, _, imgAndColorHeatmap = getConnectedComponentsAndImgData(model_input_location, input_image,
+                                                                                     label_map, desired_label_index)
+    meanPixelValue = np.mean(thresh)
+    print("Mean pixel value: " + str(meanPixelValue))
+    print("Stats sorted: " + str(statsSorted))
+    for regionStat in statsSorted:
+        print("region " + str(regionStat) + " mean pixel value " + str(
+            np.mean(thresh[regionStat[0]:(regionStat[0] + regionStat[2]), regionStat[1]:(regionStat[1] + regionStat[3])])))
+        cv2.rectangle(imgAndColorHeatmap, (regionStat[0], regionStat[1]),
+                      (regionStat[0] + regionStat[2], regionStat[1] + regionStat[3]), (255, 0, 0), 2)
+    cv2.imwrite(output_image, imgAndColorHeatmap)
 
 if __name__ == "__main__":
     makeAndSaveToFileCamClassificationHeatmap(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))

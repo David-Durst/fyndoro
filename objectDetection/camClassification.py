@@ -18,9 +18,8 @@ model_input_location = sys.argv[2]
 output_dir_class0 = sys.argv[3]
 output_dir_class1 = sys.argv[4]
 label_map = sys.argv[5]
-
 # how likely must a category be for it to be chosen
-categoryThreshold = 0.9
+categoryThreshold = float(sys.argv[6])
 
 # Data augmentation and normalization for training
 # do transforms that are normally just for validation
