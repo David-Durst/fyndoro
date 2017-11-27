@@ -98,7 +98,7 @@ for dataPoint in dset:
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
     if classProbabilities[0] > categoryThreshold:
-        print("think image " + fileName + " is class 0 as its probability was was: " + str(categoryThreshold[0]))
+        print("think image " + fileName + " is class 0 as its probability was was: " + str(classProbabilities[0]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class0 + "/" + fileName)
         #make the cam heatmap for this class
@@ -111,7 +111,7 @@ for dataPoint in dset:
             numClass0Wrong += 1
             image.save(output_dir_class0 + "/wrong/" + fileName)
     if classProbabilities[1] > categoryThreshold:
-        print("think image " + fileName + " is class 1 as its probability was: " + str(categoryThreshold[1]))
+        print("think image " + fileName + " is class 1 as its probability was: " + str(classProbabilities[1]))
         # [1] gives the indices instead of the probabilities
         image.save(output_dir_class1 + "/" + fileName)
         generateCamClassificationHeatmap(model_input_location, output_dir_class0 + "/" + fileName,
