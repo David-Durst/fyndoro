@@ -13,7 +13,7 @@ import numpy as np
 import cv2
 
 
-def generateCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index):
+def generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index):
     net = models.resnet18(pretrained=True)
     #for param in model.parameters():
     #    param.requires_grad = False
@@ -88,30 +88,45 @@ def generateCamClassificationHeatmap(model_input_location, input_image, output_i
     print('showing heatmap for label %s'%classes[desired_label_index])
     img = cv2.imread(input_image)
     height, width, _ = img.shape
-    heatmap = cv2.applyColorMap(cv2.resize(CAMs[0],(width, height)), cv2.COLORMAP_JET)
-    return (heatmap, img, heatmap * 0.3 + img * 0.5)
+    grayscaleHeatmap = cv2.resize(CAMs[0],(width, height))
+    heatmap = cv2.applyColorMap(grayscaleHeatmap, cv2.COLORMAP_JET)
+    return (grayscaleHeatmap, img, heatmap * 0.3 + img * 0.5)
 
-def makeAndSaveLargestConnectComponent(model_input_location, input_image, output_image, label_map, desired_label_index):
-    heatmap, img, result = generateCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index)
+def getLargestConnectComponentAsPILImage(model_input_location, input_image, label_map, desired_label_index):
+    grayscaleHeatmap, img, result = generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index)
     # https://stackoverflow.com/questions/35854197/how-to-use-opencvs-connected-components-with-stats-in-python
     # not that cv2.THRESH_BINARY and cv2.THRESH_OTSU are flags, binary says binary thresholding (i think)
     # otsu automatically figures out the best global thresholding
     # https://docs.opencv.org/3.3.1/d7/d4d/tutorial_py_thresholding.html
-    ret, thresh = cv2.threshold(heatmap, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(grayscaleHeatmap, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     connectivity = 8
     output = cv2.connectedComponentsWithStats(thresh, connectivity, cv2.CV_32S)
     num_labels, labels, stats, centroids = output
-    # fifth element of each element in stats is size, so getting max of those
-    largestConnectedComponentIndex = np.argsort(stats[:,4])[-2]
-    x, y, width, height, size = stats[largestConnectedComponentIndex]
+    # sort stats so one with largest area comes first
+    # fifth element of each element in stats is size, so getting largest of those
+    statsSorted = stats[np.argsort(stats[:,4])[::-1]]
+    # filter out regions that aren't greater than average by at least 20
+    # meaning at some significant part of region above threshold
+    meanPixelValue = np.mean(thresh)
+    aboveThresholdStats = [s for s in statsSorted if np.mean(thresh[s[0]:(s[0] + s[2]), s[1]:(s[1]+s[3])]) > meanPixelValue + 20]
+    # give up and take any region if none good enough
+    if len(aboveThresholdStats) == 0:
+        aboveThresholdStats = statsSorted
+    # already sorted, so 0 gets largest
     # object is of form leftmost x, topmost y, wigth, height, size
+    x, y, width, height, size = aboveThresholdStats[0]
     # not that 0,0 is top left in opencv
     # taking subset of image in bounding box
     largestConnectedComponent = img[x:(x + width), y:(y+height)]
+    # https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html#imread
+    # that shows that default color scheme is BGR, not RGB
+    # https://stackoverflow.com/questions/13576161/convert-opencv-image-into-pil-image-in-python-for-use-with-zbar-library
+    # that provides how to do conversion
+    return Image.fromarray(cv2.cvtColor(largestConnectedComponent,cv2.COLOR_BGR2RGB))
 
 
 def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index):
-    _, _, result = generateCamClassificationHeatmap(model_input_location, input_image, output_image, label_map, desired_label_index)
+    _, _, result = generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index)
     cv2.imwrite(output_image, result)
 
 if __name__ == "__main__":
