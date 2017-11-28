@@ -132,6 +132,8 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
         # that shows that default color scheme is BGR, not RGB
         # https://stackoverflow.com/questions/13576161/convert-opencv-image-into-pil-image-in-python-for-use-with-zbar-library
         # that provides how to do conversion
+        if cv2.cvtColor(connectedComponentImg,cv2.COLOR_BGR2RGB) is None:
+            print("Something is wrong: " + str(regionStat))
         imgsToReturn.append(Image.fromarray(cv2.cvtColor(connectedComponentImg,cv2.COLOR_BGR2RGB)))
     return imgsToReturn
 
