@@ -17,9 +17,10 @@ data_dir = sys.argv[1]
 model_input_location = sys.argv[2]
 output_dir_class0 = sys.argv[3]
 output_dir_class1 = sys.argv[4]
-label_map = sys.argv[5]
+output_dir_skip = sys.argv[5]
+label_map = sys.argv[6]
 # how likely must a category be for it to be chosen
-categoryThreshold = float(sys.argv[6])
+categoryThreshold = float(sys.argv[7])
 
 # Data augmentation and normalization for training
 # do transforms that are normally just for validation
@@ -83,10 +84,13 @@ os.system("mkdir -p " + output_dir_class0 + "/heatmap/")
 os.system("mkdir -p " + output_dir_class1 + "/right/")
 os.system("mkdir -p " + output_dir_class1 + "/wrong/")
 os.system("mkdir -p " + output_dir_class1 + "/heatmap/")
+os.system("mkdir -p " + output_dir_skip)
 for dataPoint in dset:
     pil_image, labelIndex = dataPoint
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
     fileName = os.path.basename(dset.imgs[i][0])
+    fileFullPath = dset.imgs[i][0]
+    fileNameWithoutExt = os.path.splitext(fileName)[0]
     i += 1
     print("image " + fileName + " is class " + str(labelIndex))
     # https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
@@ -96,6 +100,10 @@ for dataPoint in dset:
 
     if imageRegionsClass0 is None and imageRegionsClass1 is None:
         print("dropping image " + fileName + " as RPN gave no regions")
+        makeAndSaveToFileCamClassificationHeatmap(model_input_location, fileFullPath,
+                                                  output_dir_skip + "/" + fileNameWithoutExt + "_0.jpg", label_map, 0)
+        makeAndSaveToFileCamClassificationHeatmap(model_input_location, fileFullPath,
+                                                  output_dir_skip + "/" + fileNameWithoutExt + "_1.jpg", label_map, 1)
         numSkipped += 1
         printCurrentStats()
         continue
@@ -130,6 +138,10 @@ for dataPoint in dset:
     print("max probabilites are " + str(mostLikely[0]))
     if mostLikely[0][0] < categoryThreshold and mostLikely[0][1] < categoryThreshold:
         print("dropping image " + fileName + " as probabilites were all less than " + str(categoryThreshold))
+        makeAndSaveToFileCamClassificationHeatmap(model_input_location, fileFullPath,
+                                                  output_dir_skip + "/" + fileNameWithoutExt + "_0.jpg", label_map, 0)
+        makeAndSaveToFileCamClassificationHeatmap(model_input_location, fileFullPath,
+                                                  output_dir_skip + "/" + fileNameWithoutExt + "_1.jpg", label_map, 1)
         numSkipped += 1
     # write to the folder for class 0 or 1 depending on which is most likely
     # if likely to be in both classes, write to both
