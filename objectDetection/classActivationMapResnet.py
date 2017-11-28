@@ -8,6 +8,7 @@ from torchvision import models, transforms
 from torch.autograd import Variable
 from torch.nn import functional as F
 from torch import nn
+import os
 import torch
 import numpy as np
 import cv2
@@ -135,7 +136,7 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     return imgsToReturn
 
 
-def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_dir, label_map, desired_label_index):
+def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_image_location, label_map, desired_label_index):
     input_image = cv2.imread(input_image_location)
     statsSorted, thresh, grayscaleHeatmap, img, imgAndColorHeatmap = getConnectedComponentsAndImgData(model_input_location, input_image,
                                                                                      label_map, desired_label_index)
@@ -148,9 +149,9 @@ def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_
             np.mean(thresh[regionStat[1]:(regionStat[1] + regionStat[3]), regionStat[0]:(regionStat[0] + regionStat[2])])))
         cv2.rectangle(imgAndColorHeatmap, (regionStat[0], regionStat[1]),
                       (regionStat[0] + regionStat[2], regionStat[1] + regionStat[3]), (255, 0, 0), 10)
-    cv2.imwrite(output_dir + "/imgAndColorHeatmap.jpg", imgAndColorHeatmap)
-    cv2.imwrite(output_dir + "/grayscale.jpg", grayscaleHeatmap)
-    cv2.imwrite(output_dir + "/thresh.jpg", thresh)
+    cv2.imwrite(output_image_location, imgAndColorHeatmap)
+    #cv2.imwrite(os.path.dirname(output_image_location) + "/grayscale.jpg", grayscaleHeatmap)
+    #cv2.imwrite(os.path.dirname(output_image_location) + "/thresh.jpg", thresh)
 
 
 if __name__ == "__main__":

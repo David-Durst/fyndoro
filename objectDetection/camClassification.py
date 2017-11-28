@@ -105,7 +105,7 @@ for dataPoint in dset:
         imageRegions = imageRegionsClass0
     else:
         imageRegions = imageRegionsClass0 + imageRegionsClass1
-        
+
     imageRegionsAsTensors = []
     for imageRegion in imageRegions:
         imageAsTensorForEval = data_transforms(imageRegion)
