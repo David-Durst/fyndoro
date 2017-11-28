@@ -98,9 +98,11 @@ def getConnectedComponentsAndImgData(model_input_location, input_image, label_ma
     # not that cv2.THRESH_BINARY and cv2.THRESH_OTSU are flags, binary says binary thresholding (i think)
     # otsu automatically figures out the best global thresholding
     # https://docs.opencv.org/3.3.1/d7/d4d/tutorial_py_thresholding.html
-    ret, thresh = cv2.threshold(grayscaleHeatmap, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(grayscaleHeatmap, 150, 255, cv2.THRESH_BINARY_INV)# + cv2.THRESH_OTSU)
     connectivity = 8
-    output = cv2.connectedComponentsWithStats(thresh, connectivity, cv2.CV_32S)
+    # invert with bitwise_not as thresh makes the desired regions black and the rest white, but
+    # connected components finds the white regions
+    output = cv2.connectedComponentsWithStats(cv2.bitwise_not(thresh), connectivity, cv2.CV_32S)
     num_labels, labels, stats, centroids = output
     # sort stats so one with largest area comes first
     # fifth element of each element in stats is size, so getting largest of those
@@ -132,9 +134,9 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     return imgsToReturn
 
 
-def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_image, label_map, desired_label_index):
+def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_location, output_dir, label_map, desired_label_index):
     input_image = cv2.imread(input_image_location)
-    statsSorted, thresh, _, _, imgAndColorHeatmap = getConnectedComponentsAndImgData(model_input_location, input_image,
+    statsSorted, thresh, grayscaleHeatmap, img, imgAndColorHeatmap = getConnectedComponentsAndImgData(model_input_location, input_image,
                                                                                      label_map, desired_label_index)
     meanPixelValue = np.mean(thresh)
     print("Mean pixel value: " + str(meanPixelValue))
@@ -144,7 +146,10 @@ def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_
             np.mean(thresh[regionStat[0]:(regionStat[0] + regionStat[2]), regionStat[1]:(regionStat[1] + regionStat[3])])))
         cv2.rectangle(imgAndColorHeatmap, (regionStat[0], regionStat[1]),
                       (regionStat[0] + regionStat[2], regionStat[1] + regionStat[3]), (255, 0, 0), 2)
-    cv2.imwrite(output_image, imgAndColorHeatmap)
+    cv2.imwrite(output_dir + "/imgAndColorHeatmap.jpg", imgAndColorHeatmap)
+    cv2.imwrite(output_dir + "/grayscale.jpg", grayscaleHeatmap)
+    cv2.imwrite(output_dir + "/thresh.jpg", thresh)
+
 
 if __name__ == "__main__":
     makeAndSaveToFileCamClassificationHeatmap(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))
