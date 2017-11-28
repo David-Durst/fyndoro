@@ -98,7 +98,7 @@ def getConnectedComponentsAndImgData(model_input_location, input_image, label_ma
     # not that cv2.THRESH_BINARY and cv2.THRESH_OTSU are flags, binary says binary thresholding (i think)
     # otsu automatically figures out the best global thresholding
     # https://docs.opencv.org/3.3.1/d7/d4d/tutorial_py_thresholding.html
-    ret, thresh = cv2.threshold(grayscaleHeatmap, 150, 255, cv2.THRESH_BINARY)# + cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(grayscaleHeatmap, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     connectivity = 8
     # invert with bitwise_not as thresh makes the desired regions black and the rest white, but
     # connected components finds the white regions
