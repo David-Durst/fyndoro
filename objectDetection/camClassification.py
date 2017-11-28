@@ -84,11 +84,11 @@ os.system("mkdir -p " + output_dir_class1 + "/right/")
 os.system("mkdir -p " + output_dir_class1 + "/wrong/")
 os.system("mkdir -p " + output_dir_class1 + "/heatmap/")
 for dataPoint in dset:
+    pil_image, labelIndex = dataPoint
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
     fileName = os.path.basename(dset.imgs[i][0])
     i += 1
     print("image " + fileName + " is class " + str(labelIndex))
-    pil_image, labelIndex = dataPoint
     # https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
     cvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
     imageRegionsClass0 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 0)
