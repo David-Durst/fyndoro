@@ -66,6 +66,17 @@ numClass0Right = 0
 numClass0Wrong = 0
 numClass1Right = 0
 numClass1Wrong = 0
+
+def printCurrentStats():
+    print("percent right: " + str((numClass0Right + numClass1Right)/i))
+    print("percent wrong: " + str((numClass0Wrong + numClass1Wrong)/i))
+    print("percent skipped: " + str(numSkipped / i))
+    print("class 0 right: " + str(numClass0Right))
+    print("class 0 wrong: " + str(numClass0Wrong))
+    print("class 1 right: " + str(numClass1Right))
+    print("class 1 wrong: " + str(numClass1Wrong))
+    print("skipped: " + str(numSkipped))
+
 os.system("mkdir -p " + output_dir_class0 + "/right/")
 os.system("mkdir -p " + output_dir_class0 + "/wrong/")
 os.system("mkdir -p " + output_dir_class0 + "/heatmap/")
@@ -74,12 +85,27 @@ os.system("mkdir -p " + output_dir_class1 + "/wrong/")
 os.system("mkdir -p " + output_dir_class1 + "/heatmap/")
 for dataPoint in dset:
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
+    fileName = os.path.basename(dset.imgs[i][0])
+    i += 1
+    print("image " + fileName + " is class " + str(labelIndex))
     pil_image, labelIndex = dataPoint
     # https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
     cvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
     imageRegionsClass0 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 0)
     imageRegionsClass1 = getLargestConnectComponentAsPILImage(model_input_location, cvImage, label_map, 1)
-    imageRegions = imageRegionsClass0 + imageRegionsClass1
+
+    if imageRegionsClass0 is None and imageRegionsClass1 is None:
+        print("dropping image " + fileName + " as RPN gave no regions")
+        numSkipped += 1
+        printCurrentStats()
+        continue
+    elif imageRegionsClass0 is None:
+        imageRegions = imageRegionsClass1
+    elif imageRegionsClass1 is None:
+        imageRegions = imageRegionsClass0
+    else:
+        imageRegions = imageRegionsClass0 + imageRegionsClass1
+        
     imageRegionsAsTensors = []
     for imageRegion in imageRegions:
         imageAsTensorForEval = data_transforms(imageRegion)
@@ -98,12 +124,9 @@ for dataPoint in dset:
     # dimension fo tensor, which is max probability of being in
     # each category
     mostLikely = classProbabilityTensor.max(0)
-    fileName = os.path.basename(dset.imgs[i][0])
-    i += 1
     # in mostLikely, first [0] gives the probabilities of the boxes that are most likely to be in each class. skip if both max probabilities < 0.9
     # second [0] gives the probability of the element with the max probability
     # of being the first class (0 indexing)
-    print("image " + fileName + " is class " + str(labelIndex))
     print("max probabilites are " + str(mostLikely[0]))
     if mostLikely[0][0] < categoryThreshold and mostLikely[0][1] < categoryThreshold:
         print("dropping image " + fileName + " as probabilites were all less than " + str(categoryThreshold))
@@ -137,11 +160,4 @@ for dataPoint in dset:
         else:
             numClass1Wrong += 1
             imageRegions[indexOfMostLikely].save(output_dir_class1 + "/wrong/" + fileName)
-    print("percent right: " + str((numClass0Right + numClass1Right)/i))
-    print("percent wrong: " + str((numClass0Wrong + numClass1Wrong)/i))
-    print("percent skipped: " + str(numSkipped / i))
-    print("class 0 right: " + str(numClass0Right))
-    print("class 0 wrong: " + str(numClass0Wrong))
-    print("class 1 right: " + str(numClass1Right))
-    print("class 1 wrong: " + str(numClass1Wrong))
-    print("skipped: " + str(numSkipped))
+    printCurrentStats()
