@@ -99,7 +99,7 @@ def getConnectedComponentsAndImgData(model_input_location, input_image, label_ma
     # otsu automatically figures out the best global thresholding
     # https://docs.opencv.org/3.3.1/d7/d4d/tutorial_py_thresholding.html
     ret, thresh = cv2.threshold(grayscaleHeatmap, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    connectivity = 8
+    connectivity = 4
     # invert with bitwise_not as thresh makes the desired regions black and the rest white, but
     # connected components finds the white regions
     output = cv2.connectedComponentsWithStats(thresh, connectivity, cv2.CV_32S)
@@ -114,10 +114,11 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     # filter out regions that aren't greater than average by at least 20
     # meaning at some significant part of region above threshold
     meanPixelValue = np.mean(thresh)
-    aboveThresholdStats = [s for s in statsSorted if np.mean(thresh[s[0]:(s[0] + s[2]), s[1]:(s[1]+s[3])]) > meanPixelValue + 20]
-    # give up and take any region if none good enough
+    # reverse index order here as array index is row then column, aka y then x
+    aboveThresholdStats = [s for s in statsSorted if np.mean(thresh[s[1]:(s[1]+s[3]), s[0]:(s[0] + s[2])]) > meanPixelValue]
+    # give up if good regions
     if len(aboveThresholdStats) == 0:
-        aboveThresholdStats = statsSorted
+        return None
     imgsToReturn = []
     # already sorted, so 0 gets largest
     for regionStat in aboveThresholdStats:
@@ -139,11 +140,12 @@ def makeAndSaveToFileCamClassificationHeatmap(model_input_location, input_image_
     statsSorted, thresh, grayscaleHeatmap, img, imgAndColorHeatmap = getConnectedComponentsAndImgData(model_input_location, input_image,
                                                                                      label_map, desired_label_index)
     meanPixelValue = np.mean(thresh)
+    print("full image shape: " + str(img.shape))
     print("Mean pixel value: " + str(meanPixelValue))
     print("Stats sorted: " + str(statsSorted))
     for regionStat in statsSorted:
         print("region " + str(regionStat) + " mean pixel value " + str(
-            np.mean(thresh[regionStat[0]:(regionStat[0] + regionStat[2]), regionStat[1]:(regionStat[1] + regionStat[3])])))
+            np.mean(thresh[regionStat[1]:(regionStat[1] + regionStat[3]), regionStat[0]:(regionStat[0] + regionStat[2])])))
         cv2.rectangle(imgAndColorHeatmap, (regionStat[0], regionStat[1]),
                       (regionStat[0] + regionStat[2], regionStat[1] + regionStat[3]), (255, 0, 0), 10)
     cv2.imwrite(output_dir + "/imgAndColorHeatmap.jpg", imgAndColorHeatmap)
