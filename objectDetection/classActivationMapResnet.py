@@ -123,7 +123,7 @@ def getLargestConnectComponentAsPILImage(model_input_location, input_image, labe
     # already sorted, so 0 gets largest
     for regionStat in aboveThresholdStats:
         # object is of form leftmost x, topmost y, wigth, height, size
-        x, y, width, height, size = aboveThresholdStats[0]
+        x, y, width, height, size = regionStat
         # note that 0,0 is top left in opencv
         # taking subset of image in bounding box
         connectedComponentImg = img[x:(x + width), y:(y+height)]
