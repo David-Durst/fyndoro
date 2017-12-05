@@ -2,7 +2,7 @@
 inputLocation1=$(readlink -f "$1")
 inputLocation2=$(readlink -f "$2")
 outputLocation1=$(readlink -f "$3")
-num=$5
+num=$4
 IFS='
 ' # make it so that only the
 cd $inputLocation1
