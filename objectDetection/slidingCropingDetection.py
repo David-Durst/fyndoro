@@ -37,6 +37,8 @@ class regionCoordinate:
 # do transforms that are normally just for validation
 # for all data
 imageScales = [1000, 750, 500, 250] # how big will the whole image be in pixels
+imageMaxScale = max(imageScales)
+
 
 network_input_width = 250 # widths the network expeccts
 regionCoordinates = [regionCoordinate(x, y, network_input_width, network_input_width, s) for s in imageScales for x in range(0, s, 250) for y in range(0, s, 250)]
@@ -101,7 +103,8 @@ os.system("mkdir -p " + output_dir_class1 + "/wrong/")
 os.system("mkdir -p " + output_dir_class1 + "/heatmap/")
 os.system("mkdir -p " + output_dir_skip)
 for dataPoint in dset:
-    pil_image, labelIndex = dataPoint
+    pil_image_unresized, labelIndex = dataPoint
+    pil_image = pil_image_unresized.resize((imageMaxScale, imageMaxScale))
     print("Working on element " + str(i) + " of " + numPoints, flush=True)
     fileName = os.path.basename(dset.imgs[i][0])
     fileFullPath = dset.imgs[i][0]
