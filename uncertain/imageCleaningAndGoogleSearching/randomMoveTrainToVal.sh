@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-inputLocation1=$(dirname "$(readlink -f "$1")")
-inputLocation2=$(dirname "$(readlink -f "$2")")
-outputLocation1=$(dirname "$(readlink -f "$3")")
+inputLocation1=$(readlink -f "$1")
+inputLocation2=$(readlink -f "$2")
+outputLocation1=$(readlink -f "$3")
 num=$5
 IFS='
 ' # make it so that only the
