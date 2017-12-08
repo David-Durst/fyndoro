@@ -20,8 +20,9 @@ for dfsForTrial in allDFs:
         columns = dfsForTrial[i].columns
         if i == 0:
             ax = dfsForTrial[i].plot(x=columns[1], y=columns[2], linestyle='--', marker='o')
-            ax.set_ylabel('Best Validation Accuracy Across All Epochs')
-            plt.title(outputName + str(trialIdx))
+            ax.set_ylabel('Validation Accuracy', fontsize=15)
+            ax.set_xlabel('Imagenet Images', fontsize=15)
+            plt.title('Male or Female', fontsize=15)
         else:
             dfsForTrial[i].plot(x=columns[1], y=columns[2], ax=ax, linestyle='--', marker='o')
     plt.savefig(pathToTrialsData + "vis_trial" + str(trialIdx))
