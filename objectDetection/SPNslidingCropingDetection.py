@@ -57,7 +57,7 @@ use_gpu = torch.cuda.is_available()
 
 model = vgg16_sp(3, pretrained=True)
 checkpoint = torch.load(model_input_location)
-model.load_state_dict(checkpoint['state_dict'])
+model.load_state_dict(torch.load(model_input_location))
 #for param in model.parameters():
 #    param.requires_grad = False
 # if model_input_location is empty, use default weights
