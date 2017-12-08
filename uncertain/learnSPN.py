@@ -97,7 +97,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs):
 
     best_model = model
     best_acc = 0.0
-    final_layer_weights_last_iteration = model.fc.weight.clone()
+    #final_layer_weights_last_iteration = model.fc.weight.clone()
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -154,12 +154,12 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs):
                 best_acc = epoch_acc
                 best_model = copy.deepcopy(model)
 
-        print("last layer weights:")
-        print(model.fc.weight)
-        print('{:.7f}: sum of abs of difference in weights'.format(
-            (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
-        final_layer_weights_last_iteration = model.fc.weight.clone()
-        print()
+        #print("last layer weights:")
+        #print(model.fc.weight)
+        #print('{:.7f}: sum of abs of difference in weights'.format(
+        #    (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
+        #final_layer_weights_last_iteration = model.fc.weight.clone()
+        #print()
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(
