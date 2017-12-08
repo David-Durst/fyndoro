@@ -5,9 +5,9 @@ modelCheckpoint=$(readlink -f "$1")
 imagesParent=$(readlink -f "$2")
 outputName=$3
 scriptDir=$(dirname "$(readlink -f "$0")")
-categoryGroups=("scarletTanager" "summerTanager")
-numImages=(1 2 5)
-numIterations=4
+categoryGroups=("louisVuitton" "handbag" "random")
+numImages=(81)
+numIterations=2
 #$scriptDir/makeDataForExperiments.sh $imagesParent
 
 #get in directory above script for running uncertain.learn correctly
@@ -53,7 +53,7 @@ do
         rm $uptoiDir/embeddings
         num_imagenet=$(expr 2 \* $n)
         set -x
-        python -m uncertain.learnSPN $uptoiDir modelCheckpoint $num_imagenet ${outputFiles[$i]} ${model_output_folder[$i]}
+        python -m uncertain.learnSPN $uptoiDir $modelCheckpoint $num_imagenet ${outputFiles[$i]} ${model_output_folder[$i]}
         num_augmented_images=${uptoiDir},$(expr $i - 1),${num_imagenet}
         for categoryGroup in "${categoryGroups[@]}"
         do
