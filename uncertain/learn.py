@@ -177,7 +177,7 @@ def exp_lr_scheduler(optimizer, epoch, init_lr=0.001, lr_decay_epoch=7):
 
     return optimizer
 
-model_ft = models.resnet18(pretrained=True)
+model_ft = models.resnet101(pretrained=True)
 #for param in model_ft.parameters():
 #    param.requires_grad = False
 num_ftrs = model_ft.fc.in_features

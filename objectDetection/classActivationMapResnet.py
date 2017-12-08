@@ -15,7 +15,7 @@ import cv2
 
 
 def generateCamClassificationHeatmap(model_input_location, input_image, label_map, desired_label_index):
-    net = models.resnet18(pretrained=True)
+    net = models.resnet101(pretrained=True)
     #for param in model.parameters():
     #    param.requires_grad = False
     num_ftrs = net.fc.in_features

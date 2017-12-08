@@ -53,7 +53,7 @@ dset = datasets.ImageFolder(data_dir)
 
 use_gpu = torch.cuda.is_available()
 
-model = models.resnet18(pretrained=True)
+model = models.resnet101(pretrained=True)
 #for param in model.parameters():
 #    param.requires_grad = False
 num_ftrs = model.fc.in_features
