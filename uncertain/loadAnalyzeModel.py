@@ -22,7 +22,7 @@ def getEmbeddingsNPArr(modelResults, trainOrValKey):
     return np.array(embeddingsDF.tolist())
 
 class valElementMostSimilar(object):
-    def __init__(self, valIndex, trainIndex, distance, valFilename, trainFilename):
+    def __init__(self, trainIndex, valIndex, distance, trainFilename, valFilename):
         self.valIndex = valIndex
         self.trainIndex = trainIndex
         self.distance = distance
@@ -44,15 +44,15 @@ class valElementMostSimilar(object):
 #import loadAnalyzeModel
 #res = loadAnalyzeModel.loadModelApplicationResults("birds2Models_4/dataToLabels_10_2755_1227")
 #loadAnalyzeModel.getMultipleExamplesBySimilarity(res, "birds2Models_4/multiple_examples_10_2755_1227")
-def getMultipleSimilarTrainPointsForEachVal(modelResults):
+def getMultipleSimilarValPointsForEachTrain(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
     valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
-    nbrs = NearestNeighbors(n_neighbors=5, metric="cosine", algorithm='auto').fit(np.array(trainEmbeddingsNP))
-    distances, nearestTrainIndicesForEachValNestedArr = nbrs.kneighbors(valEmbeddingsNP)
-    mostSimilarClassesList = [valElementMostSimilar(valIndex, trainIndices.tolist(), distances[valIndex].tolist(),
-                                                    modelResults["val"][0][valIndex],
-                                                    modelResults["train"][0][trainIndices].tolist()) for
-                              valIndex, trainIndices in enumerate(nearestTrainIndicesForEachValNestedArr)]
+    nbrs = NearestNeighbors(n_neighbors=5, metric="cosine", algorithm='auto').fit(np.array(valEmbeddingsNP))
+    distances, nearestValIndicesForEachTrainNestedArr = nbrs.kneighbors(trainEmbeddingsNP)
+    mostSimilarClassesList = [valElementMostSimilar(trainIndex, valIndices.tolist(), distances[trainIndex].tolist(),
+                                                    modelResults["train"][0][trainIndex],
+                                                    modelResults["val"][0][valIndices].tolist()) for
+                              trainIndex, valIndices in enumerate(nearestValIndicesForEachTrainNestedArr)]
     return pd.DataFrame.from_dict([mostSimilarEl.to_dict() for mostSimilarEl in mostSimilarClassesList])
 
 
@@ -60,7 +60,7 @@ def getMultipleExamplesBySimilarity(modelResults, outputLocation):
     increments = 0.0001
     os.system("mkdir " + outputLocation)
     splitPoints = np.arange(0.0, 0.002, increments)
-    mostSimilarDF = getMultipleSimilarTrainPointsForEachVal(modelResults).sort_values('distance')
+    mostSimilarDF = getMultipleSimilarValPointsForEachTrain(modelResults).sort_values('distance')
     for pnt in splitPoints:
         # a series containg the first, smallest value of the distance column for each row in mostSimilarDF
         firstDistanceValueSeries = mostSimilarDF['distance'].apply(lambda xs: xs[0])
@@ -74,34 +74,34 @@ def getMultipleExamplesBySimilarity(modelResults, outputLocation):
             ithSimilarAtPnt = mostSimilarAtPntDF.iloc[i]
             valPointOutputPath = pntFolderPath + "/" + str(i) + "_" + str(ithSimilarAtPnt['distance'][0])
             os.system("mkdir " + valPointOutputPath)
-            os.system("cp \"" + ithSimilarAtPnt['valFilename'] + "\" " + valPointOutputPath + "/")
+            os.system("cp \"" + ithSimilarAtPnt['trainFilename'] + "\" " + valPointOutputPath + "/")
             for j in range(len(ithSimilarAtPnt['distance'])):
                 trainPointOutputPath = valPointOutputPath + "/" + str(j) + "_" + str(ithSimilarAtPnt['distance'][j])
                 os.system("mkdir " + trainPointOutputPath)
-                os.system("cp \"" + ithSimilarAtPnt['trainFilename'][j] + "\" " + trainPointOutputPath + "/")
+                os.system("cp \"" + ithSimilarAtPnt['valFilename'][j] + "\" " + trainPointOutputPath + "/")
 
-def getMostSimilarTrainPointForEachVal(modelResults):
+def getMostSimilarValPointForEachTrain(modelResults):
     trainEmbeddingsNP = getEmbeddingsNPArr(modelResults, "train")
     valEmbeddingsNP = getEmbeddingsNPArr(modelResults, "val")
-    nbrs = NearestNeighbors(n_neighbors=1, metric="cosine", algorithm='auto').fit(np.array(trainEmbeddingsNP))
-    distances, nearestTrainIndexForEachValNestedArr = nbrs.kneighbors(valEmbeddingsNP)
+    nbrs = NearestNeighbors(n_neighbors=1, metric="cosine", algorithm='auto').fit(np.array(valEmbeddingsNP))
+    distances, nearestValIndexForEachTrainNestedArr = nbrs.kneighbors(trainEmbeddingsNP)
     # normally, each element is an array (as may have more than 1 nearest neighbor)
     # remove the array per val element as only 1 nearest neighbor in train
-    nearestTrainIndexForEachVal = np.apply_along_axis(lambda x: x[0], 1, nearestTrainIndexForEachValNestedArr)
-    mostSimilarClassesList = [valElementMostSimilar(valIndex, trainIndex, distances[valIndex][0], modelResults["val"][0][valIndex], modelResults["train"][0][trainIndex]) for valIndex, trainIndex in enumerate(nearestTrainIndexForEachVal)]
+    nearestValIndexForEachTrain = np.apply_along_axis(lambda x: x[0], 1, nearestValIndexForEachTrainNestedArr)
+    mostSimilarClassesList = [valElementMostSimilar(trainIndex, valIndex, distances[trainIndex][0], modelResults["train"][0][trainIndex], modelResults["val"][0][valIndex]) for trainIndex, valIndex in enumerate(nearestValIndexForEachTrain)]
     return pd.DataFrame.from_dict([mostSimilarEl.to_dict() for mostSimilarEl in mostSimilarClassesList])
 
 def getMostSimilarDistanceDistibution(modelResults):
-    mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults)
+    mostSimilarDF = getMostSimilarValPointForEachTrain(modelResults)
     plt.close()
     mostSimilarDF.hist("distance", bins=20)
-    plt.savefig('mostSimilarDistances.pdf')
+    plt.savefig('mostSimilarDistances.png')
 
 def getExamplesBySimilarity(modelResults, outputLocation):
     increments = 0.01
     os.system("mkdir " + outputLocation)
     splitPoints = np.arange(1.0, 1.08, increments)
-    mostSimilarDF = getMostSimilarTrainPointForEachVal(modelResults).sort_values('distance')
+    mostSimilarDF = getMostSimilarValPointForEachTrain(modelResults).sort_values('distance')
     for pnt in splitPoints:
         mostSimilarAtPntDF = mostSimilarDF[(mostSimilarDF['distance'] >= pnt) & (mostSimilarDF['distance'] < pnt + increments)].head(5)
         pntFolderPath = outputLocation + "/" + str(pnt)

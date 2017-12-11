@@ -16,12 +16,15 @@ import copy
 from uncertain.uncertainCrossEntropyLoss import UncertainCrossEntropyLoss
 import sys
 import os
+import spn
+from experiment.models import vgg16_sp
 
 # inputs should be directory_of_data number_positive_examples output_file model_output_dir
 data_dir = sys.argv[1]
-num_training_str = sys.argv[2]
-output_file = sys.argv[3]
-model_output_dir = sys.argv[4]
+model_checkpoint_location = sys.argv[2]
+num_training_str = sys.argv[3]
+output_file = sys.argv[4]
+model_output_dir = sys.argv[5]
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -94,7 +97,7 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs):
 
     best_model = model
     best_acc = 0.0
-    final_layer_weights_last_iteration = model.fc.weight.clone()
+    #final_layer_weights_last_iteration = model.fc.weight.clone()
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -151,12 +154,12 @@ def train_model(model, criterion, optimizer, lr_scheduler, num_epochs):
                 best_acc = epoch_acc
                 best_model = copy.deepcopy(model)
 
-        print("last layer weights:")
-        print(model.fc.weight)
-        print('{:.7f}: sum of abs of difference in weights'.format(
-            (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
-        final_layer_weights_last_iteration = model.fc.weight.clone()
-        print()
+        #print("last layer weights:")
+        #print(model.fc.weight)
+        #print('{:.7f}: sum of abs of difference in weights'.format(
+        #    (final_layer_weights_last_iteration - model.fc.weight).abs().sum().data[0]))
+        #final_layer_weights_last_iteration = model.fc.weight.clone()
+        #print()
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(
@@ -177,14 +180,19 @@ def exp_lr_scheduler(optimizer, epoch, init_lr=0.001, lr_decay_epoch=7):
 
     return optimizer
 
-model_ft = models.resnet101(pretrained=True)
+model = vgg16_sp(20, pretrained=True)
+checkpoint = torch.load(model_checkpoint_location)
+model.load_state_dict(checkpoint['state_dict'])
 #for param in model_ft.parameters():
 #    param.requires_grad = False
-num_ftrs = model_ft.fc.in_features
-model_ft.fc = nn.Linear(num_ftrs, len(dset_classes))
+num_maps = 1024
+model.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(num_maps, len(dset_classes))
+        )
 
 if use_gpu:
-    model_ft = model_ft.cuda()
+    model_ft = model.cuda()
 
 criterion = nn.CrossEntropyLoss()
 

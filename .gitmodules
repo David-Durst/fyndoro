@@ -1,0 +1,3 @@
+[submodule "endToEnd/SPN.pytorch"]
+	path = endToEnd/SPN.pytorch
+	url = git@github.com:yeezhu/SPN.pytorch.git
