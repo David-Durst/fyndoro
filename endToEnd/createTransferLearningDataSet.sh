@@ -6,12 +6,22 @@ scriptDir=$(dirname "$(readlink -f "$0")")
 images=$1
 createTrainVal=true
 createDatasets=true
-categoryGroups=("scarletTanager" "summerTanager")
-declare -A searchwords=( [${categoryGroups[0]}]="scarlet tanager" [${categoryGroups[1]}]="summer tanager")
-declare -A keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")
-# wrongwords are words that indicate an image is bad
-declare -A wrongwordFilters=( [${categoryGroups[0]}]="summer" [${categoryGroups[1]}]="scarlet")
-numIterations=3
+if [ -z ${categoryGroups+x} ]
+then
+    echo "categoryGroups unset, using default values for all text search options"
+    categoryGroups=("scarletTanager" "summerTanager")
+    declare -A searchwords=( [${categoryGroups[0]}]="scarlet tanager" [${categoryGroups[1]}]="summer tanager")
+    declare -A keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")
+    # wrongwords are words that indicate an image is bad
+    declare -A wrongwordFilters=( [${categoryGroups[0]}]="summer" [${categoryGroups[1]}]="scarlet")
+fi
+
+if [ -z ${numIterations+x} ]
+then
+    echo "numIterations not set, setting to default value of 2 (first iteration text search, all others reverse image search)"
+    numIterations=2
+fi
+
 # setting train images to 0 here as downloading all train images by label
 trainImages=0
 # note that train increments need to sum to trainImages
