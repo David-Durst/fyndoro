@@ -60,7 +60,9 @@ def removeTooSimiliar(modelResults):
     for i in range(len(tooSimilarDF)):
         os.system("rm \"" + tooSimilarDF.iloc[i]['trainFilename'] + "\"")
 
-data_embeddings = sys.argv[1]
-model_results = loadModelApplicationResults(data_embeddings)
-removeTooSimiliar(model_results)
+def generateEmebeddingsAndFilterTooSimilar(data_embeddings):
+    model_results = loadModelApplicationResults(data_embeddings)
+    removeTooSimiliar(model_results)
 
+if __name__ == "__main__":
+    generateEmebeddingsAndFilterTooSimilar(sys.argv[1])

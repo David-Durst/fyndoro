@@ -10,11 +10,12 @@ if [ -z ${categoryGroups+x} ]
 then
     echo "categoryGroups unset, using default values for all text search options"
     categoryGroups=("scarletTanager" "summerTanager")
-    declare -A searchwords=( [${categoryGroups[0]}]="scarlet tanager" [${categoryGroups[1]}]="summer tanager")
-    declare -A keywordFilters=( [${categoryGroups[0]}]="scarlet" [${categoryGroups[1]}]="summer")
+    declare -A searchwords=("scarlet tanager" "summer tanager")
+    declare -A keywordFilters=("scarlet" "summer")
     # wrongwords are words that indicate an image is bad
-    declare -A wrongwordFilters=( [${categoryGroups[0]}]="summer" [${categoryGroups[1]}]="scarlet")
+    declare -A wrongwordFilters=("summer" "scarlet")
 fi
+numCategoryGroups=${#categoryGroups[@]}
 
 if [ -z ${numIterations+x} ]
 then
@@ -75,8 +76,9 @@ downloadedImages=$images/downloadedImages
 # remove all old training and validation copies of data
 rm -rf $downloadedImages
 mkdir -p $downloadedImages
-for c in "${categoryGroups[@]}"
+for i in $(seq 0 $(expr $numCategoryGroups - 1))
 do
+    c="${categoryGroups[$i]}"
     for j in $(seq $numIterations)
     do
         curIterDir=$downloadedImages/$j/train/$c
@@ -108,12 +110,12 @@ do
         if [ $j == 1 ]
         then
             set +x
-            python $scriptDir/scape/textScrape.py "${searchwords[$c]}" $curIterDir/
-            python $scriptDir/filterNonImages.py $curIterDir/
+            python $scriptDir/scrape/textScrape.py "${searchwords[$i]}" $curIterDir/
+            python $scriptDir/filterImages/filterNonImages.py $curIterDir/
             set -x
         fi
-        python $scriptDir/scape/reverseImageScrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$c]}" "${wrongwordFilters[$c]}"
-        python $scriptDir/filter/filterNonImages.py $nextIterDir/
+        python $scriptDir/scrape/reverseImageScrape.py $curIterDir/ $nextIterDir/ "${keywordFilters[$i]}" "${wrongwordFilters[$i]}"
+        python $scriptDir/filterImages/filterNonImages.py $nextIterDir/
         # join next iter images with all previous ones
         mkdir -p $uptoNextIterDir
         # if first iter, make upToCurDir as no prev iteration to make it
