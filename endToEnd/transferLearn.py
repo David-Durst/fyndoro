@@ -19,7 +19,7 @@ import os
 import spn
 from experiment.models import vgg16_sp
 
-def transferLearn(data_dir, model_checkpoint_location, num_training_str, output_file, model_output_file):
+def transferLearn(data_dir, model_checkpoint_location, label_map_file, model_output_file):
     # Data augmentation and normalization for training
     # Just normalization for validation
     data_transforms = {
@@ -72,6 +72,10 @@ def transferLearn(data_dir, model_checkpoint_location, num_training_str, output_
     #                for x in ['train', 'val']}
     dset_sizes = {x: len(dsets[x]) for x in ['train', 'val']}
     dset_classes = dsets['train'].classes
+
+    with open(label_map_file, 'a') as f:
+        f.write(str([(i, c) for i, c in enumerate(dset_classes)]))
+
     print("Classes to index mapping is" + str([(i, c) for i, c in enumerate(dset_classes)]))
 
     use_gpu = torch.cuda.is_available()
@@ -196,11 +200,8 @@ def transferLearn(data_dir, model_checkpoint_location, num_training_str, output_
     model_ft, best_acc = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                            num_epochs=25)
 
-    with open(output_file, 'a') as f:
-        f.write(data_dir + "," + num_training_str + "," + str(best_acc) + "\n")
-
     torch.save(model_ft.state_dict(), model_output_file)
 
 if __name__ == "__main__":
-    # inputs should be data_dir, model_checkpoint_location, num_training_str, output_file, model_output_dir
-    transferLearn(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    # inputs should be data_dir, model_checkpoint_location, model_output_dir
+    transferLearn(sys.argv[1], sys.argv[2], sys.argv[3])

@@ -2,11 +2,10 @@ from subprocess import Popen, PIPE
 import argparse
 import os
 import importlib
-from random import randint
 import time
 from endToEnd.filterImages import filterBasedOnEmbeddingSimilarity, getEmbeddingsForData
+from endToEnd.constants import *
 
-scriptPath = os.path.dirname(os.path.realpath(__file__))
 parser = argparse.ArgumentParser(description='Download the data for a model and train it.')
 
 requiredNamed = parser.add_argument_group('required arguments')
@@ -26,6 +25,9 @@ requiredNamed.add_argument('--wrongwordFilters', metavar='"category n wrongword 
 
 
 optionalNamed = parser.add_argument_group('optional arguments')
+optionalNamed.add_argument('--nameOfOutput', default=None,
+                    help='The name for the data and model to be save under in the modelsAndData folder. Model will be '
+                         'under name <name>_model.pth. If unset, the categories will be used with spaces removed.')
 optionalNamed.add_argument('--scrapeOnRemote', default=False, action='store_true',
                     help='enable this to run the scraper on a different host from the rest of the system')
 optionalNamed.add_argument('--scrapingUserHost', metavar="user@host", default='durst@dawn4',
@@ -48,7 +50,7 @@ def executeShellCommand(commandStr, shell=shell, returnResult=False):
     shell.stdin.write(str.encode(commandStr + '\n'))
     shell.stdin.flush()
     if returnResult:
-        return shell.stdout.readline().decode()
+        return shell.stdout.readline()
 
 def convertListOfStringsToBashArray(inputList, wrapString = "\""):
     return " ".join(list(map(lambda s: wrapString + s + wrapString, inputList)))
@@ -61,18 +63,23 @@ def convertListOfStringsToBashArray(inputList, wrapString = "\""):
 
 # install SPN.pytorch if its not already installed
 if importlib.util.find_spec("spn") is None:
-    executeShellCommand("cd %s/SPN.pytorch/spnlib" % scriptPath)
-#    executeShellCommand("bash make.sh")
+    executeShellCommand("cd %s/SPN.pytorch/spnlib" % modulePath)
+    executeShellCommand("bash make.sh")
+#import after sure installed
+import endToEnd.transferLearn as transferLearn
 
 # if model doesn't already exist, make it
-executeShellCommand("cd %s/SPN.pytorch/demo" % scriptPath)
-#if not os.path.isfile("logs/voc2007/model_best.pth.tar"):
-#    executeShellCommand("bash runme.sh")
-executeShellCommand("cd %s" % scriptPath)
+executeShellCommand("cd %s/SPN.pytorch/demo" % modulePath)
+pathToModelPreTransferLearning = modulePath + "/SPN.pytorch/demo/logs/voc2007/model_best.pth.tar"
+if not os.path.isfile(pathToModelPreTransferLearning):
+    executeShellCommand("bash runme.sh")
+executeShellCommand("cd %s" % modulePath)
 
 # get strings for bash for getting data
 categoryGroupsBashStr = "categoryGroups=(%s)" % (convertListOfStringsToBashArray(args.categories, wrapString=""))
-categoryGroupsFileName = convertListOfStringsToBashArray(args.categories, wrapString="").replace(" ", "") + "-" + time.strftime("%Y%m%d-%H%M%S")
+
+outputName = convertListOfStringsToBashArray(args.categories, wrapString="").replace(" ", "") if args.nameOfOutput is None else args.nameOfOutput
+outputNameWithDatetime = outputName + "-" + time.strftime("%Y%m%d-%H%M%S")
 
 searchwordsBashStr = "export searchwords=(%s)" % (convertListOfStringsToBashArray(args.categories))
 keywordFiltersBashStr = "export keywordFilters=(%s)" % (convertListOfStringsToBashArray(args.categories))
@@ -80,8 +87,6 @@ wrongwordFiltersBashStr = "export wrongwordFilters=(%s)" % (convertListOfStrings
 declareAllVars = "export %s ; export numIterations=%s ; export uniqueNum=$RANDOM ; %s ; %s ; %s ; " % \
                  (categoryGroupsBashStr, args.numIterations, searchwordsBashStr, keywordFiltersBashStr, wrongwordFiltersBashStr)
 
-print(declareAllVars)
-exit(0)
 
 # get data for transfer learning model
 if args.scrapeOnRemote:
@@ -95,16 +100,16 @@ if args.scrapeOnRemote:
         exit(1)
     else:
         executeShellCommand(
-            "ssh -q %s '%s %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd/endToEnd/modelsAndData/%s_data &> %s/endToEnd/endToEnd/modelsAndData/%s_data.log'" % (
-            args.scrapingHost, declareAllVars, args.remoteDir, args.remoteDir, categoryGroupsFileName, categoryGroupsFileName))
+            "ssh -q %s '%s %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd/modelsAndData/%s_data &> %s/endToEnd/modelsAndData/%s_data.log'" % (
+            args.scrapingHost, declareAllVars, args.remoteDir, args.remoteDir, outputName, outputNameWithDatetime))
         executeShellCommand("rsync -a %s:%s/endToEnd/modelsAndData/%s_data %s/modelsAndData/" %
-                            (args.scrapingHost, args.remoteDir, categoryGroupsFileName, scriptPath))
+                            (args.scrapingHost, args.remoteDir, outputName, modulePath))
 else:
     executeShellCommand("%s %s/createTransferLearningDataSet.sh %s/modelsAndData/%s_data &> %s/modelsAndData/%s_data.log" % (
-        declareAllVars, scriptPath, scriptPath, categoryGroupsFileName, scriptPath, categoryGroupsFileName))
+        declareAllVars, modulePath, modulePath, outputName, modulePath, outputNameWithDatetime))
 
-pathToImages = "%s/modelsAndData/%s_data/downloadedImages/upto_%s" % (scriptPath, categoryGroupsFileName, args.numIterations)
-pathToEmbeddings = "%s/modelsAndData/%s_data/embeddings" % (scriptPath, categoryGroupsFileName)
+pathToImages = "%s/modelsAndData/%s_data/downloadedImages/upto_%s" % (modulePath, outputName, args.numIterations)
+pathToEmbeddings = "%s/modelsAndData/%s_data/embeddings" % (modulePath, outputName)
 # clean up data for model
 getEmbeddingsForData.generateEmbeddings(pathToImages, "", pathToEmbeddings)
 filterBasedOnEmbeddingSimilarity.generateEmebeddingsAndFilterTooSimilar(pathToEmbeddings)
@@ -112,10 +117,13 @@ filterBasedOnEmbeddingSimilarity.generateEmebeddingsAndFilterTooSimilar(pathToEm
 #        python uncertain/imageCleaningAndGoogleSearching/filterBasedOnEmbeddingSimilarity.py $uptoiDir/embeddings
 
 #transfer learn model
-executeShellCommand("%s/transferLearnModel.sh %s/SPN.pytorch/demo/logs/voc2007/model_best.pth.tar "
-                    "%s/modelsAndData/%s_data %s/modelsAndData/%s_model &> %s/modelsAndData/%s_model" %
-                    (scriptPath, scriptPath, scriptPath, categoryGroupsFileName, scriptPath, categoryGroupsFileName,
-                     scriptPath, categoryGroupsFileName))
+pathToModelPostTransferLearning = "%s/modelsAndData/%s_model" % (modulePath, outputName)
+transferLearn.transferLearn(pathToImages, pathToModelPreTransferLearning, "%s/modelsAndData/%s_data/indexToClassMap" % (modulePath, outputName),
+                            pathToModelPostTransferLearning)
+#executeShellCommand("%s/transferLearnModel.sh %s/SPN.pytorch/demo/logs/voc2007/model_best.pth.tar "
+#                    "%s/modelsAndData/%s_data %s/modelsAndData/%s_model &> %s/modelsAndData/%s_model" %
+#                    (modulePath, modulePath, modulePath, categoryGroupsFileName, modulePath, categoryGroupsFileName,
+#                     modulePath, categoryGroupsFileName))
 
 #"../objectDetection/SPN.pytorch/demo/logs/voc2007/model_best.pth.tar"
 
