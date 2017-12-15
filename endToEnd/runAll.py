@@ -15,7 +15,7 @@ def runAll(taskName, categoryThreshold, categories, searchwords, keywordFilters,
     # NEED DATA_DIR FOR INFERENCE
     inferenceImagesPath = getInferenceImagesFolderPath(taskName)
     os.system("mkdir -p %s" % inferenceImagesPath)
-    for c in categories:
+    for c in categories[:2]:
         os.system("instagram-scraper %s --tag -d %s/%s --maximum 2000" % (taskName, inferenceImagesPath, taskName))
 
     # do this here only after makeTrainedModel ensures spn is installed

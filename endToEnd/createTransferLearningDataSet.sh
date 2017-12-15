@@ -6,6 +6,7 @@ scriptDir=$(dirname "$(readlink -f "$0")")
 images=$1
 createTrainVal=true
 createDatasets=true
+randomImages=~/fyndoro/randomImages
 if [ -z ${categoryGroups+x} ]
 then
     echo "categoryGroups unset, using default values for all text search options"
@@ -127,6 +128,7 @@ do
         rsync --ignore-existing -a $nextIterDir/ $uptoNextIterDir/
         rsync --ignore-existing -a $uptoCurDir/ $uptoNextIterDir/
     done
+    ln -sr $randomImages $downloadedImages/upto_$j/train
 done
 
 
