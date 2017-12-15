@@ -12,8 +12,10 @@
 3. Install gshuf (or shuf on linux) - brew install coreutils for mac
 4. Run the learner - python -m uncertain.learn
 
-
+How to run:
+You will either need to run the scraper on the same machine as the rest of the pipeline, or have passwordless login to the remote machine. For (almost) everywhere but Stanford, use public/private keys. For Stanford, run `kinit && aklog` to get a 24 hour kerberos ticket and repeat this every 24 hours you need the system to work.
 files to look at:
+NOTE: two important gotchas with the system currently are: 1. you can only train to detect two classes at a time. 2. There is a third class, random, that is used for everything except the classes you are training for. The name "random" must come after the names of your classes when alphabetically sorted. If it does not, then change the name of random to something that comes later in the alphabet, like "zzzzzz".
 
 uncertain/learn.py - takes in a dataset (one train folder, one val folder), trains a model, and outputs its best validation accuracy
 uncertain/imageCleaningAndGoogleSearching/scrape.py - takes in a folder of images, produces a new folder where it google reverse image searches every image in the input folder and scrapes those that match the filters

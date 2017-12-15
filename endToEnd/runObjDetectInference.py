@@ -7,6 +7,7 @@ from torchvision import datasets, models, transforms
 import torch.nn.functional as F
 import sys
 import os
+import argparse
 import spn
 from experiment.models import vgg16_sp
 import numpy as np
@@ -165,8 +166,27 @@ def runObjDetection(data_dir, model_input_location, output_dir_class0, output_di
                 imageRegions[indexOfMostLikely].save(output_dir_class1 + "/wrong/" + fileName)
         printCurrentStats()
 
+def setupArgParserForObjDetection(parser):
+    requiredNamed = parser.add_argument_group('required arguments for inference')
+    requiredNamed.add_argument('--data_dir', metavar="/path/to/dir", required=True,
+                               help='the path to the folder containing all the images split into subfolders '
+                                    'by the categories of objects to be detected')
+    requiredNamed.add_argument('--model_input_location', metavar="/path/to/file", required=True,
+                               help='the file containing the learned weights for the model')
+    requiredNamed.add_argument('--output_dir_class0', metavar="className", required=True,
+                               help='the name of the class index 0, used to name the output directory')
+    requiredNamed.add_argument('--output_dir_class1', metavar="className", required=True,
+                               help='the name of the class index 1, used to name the output directory')
+    requiredNamed.add_argument('--output_dir_skip', metavar="className", required=True,
+                               help='the name of the class index 2, used to name the output directory')
+    requiredNamed.add_argument('--categoryThreshold', required=True,
+                               help='how confident the model should be for it to determine that an image is of a given class. Set this between 0 and 1')
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Download the data for a model and train it.')
+    setupArgParserForObjDetection(parser)
+    args = parser.parse_args()
+    print("Input args:" + str(args))
+
     # inputs should be directory_of_data number_positive_examples output_file model_output_dir
-    runObjDetection(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
-    # how likely must a category be for it to be chosen
-    categoryThreshold = float(sys.argv[7])
+    runObjDetection(args.data_dir, args.model_input_location, args.output_dir_class0, args.output_dir_class1,
+                    args.output_dir_skip, float(args.categoryThreshold))

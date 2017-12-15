@@ -6,6 +6,7 @@ from __future__ import print_function, division
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import argparse
 from torch.autograd import Variable
 import torchvision
 from torchvision import datasets, models, transforms
@@ -202,6 +203,21 @@ def transferLearn(data_dir, model_checkpoint_location, label_map_file, model_out
 
     torch.save(model_ft.state_dict(), model_output_file)
 
+def setupArgParserForTransferLearning(parser):
+    requiredNamed = parser.add_argument_group('required arguments for transfer learning the model')
+    requiredNamed.add_argument('--data_dir', metavar="/path/to/dir", required=True,
+                               help='the path to the folder containing all the images, first split by train and val, then'
+                                    'by all the categories of objects to be detected')
+    requiredNamed.add_argument('--model_checkpoint_location', metavar="/path/to/file", required=True,
+                               help='the file containing the untransfer learned weights for the model')
+    requiredNamed.add_argument('--label_map_file', metavar="/path/to/file", required=True,
+                               help='where to save the file with mapping from index to class name')
+    requiredNamed.add_argument('--model_output_file', metavar="/path/to/dir", required=True,
+                               help='the location to put the model\'s weights')
 if __name__ == "__main__":
-    # inputs should be data_dir, model_checkpoint_location, model_output_dir
-    transferLearn(sys.argv[1], sys.argv[2], sys.argv[3])
+    parser = argparse.ArgumentParser(description='Download the data for a model and train it.')
+    setupArgParserForTransferLearning(parser)
+    args = parser.parse_args()
+    print("Input args:" + str(args))
+
+    transferLearn(args.data_dir, args.model_checkpoint_location, args.label_map_file, args.model_output_file)
