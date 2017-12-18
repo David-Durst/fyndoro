@@ -142,5 +142,5 @@ if __name__ == "__main__":
     # python makeTrainedModel.py --categories cat0 cat1 cat2 --searchwords "0hat 0dog omaha0" "1blue 1red 1how" "2in 2out" --keywordFilters "0a 0b" "1c 1d" "2 q" --wrongwordFilters "0no 0" "1no 1 11 1 12 23 1n noasd a" "2 3123123asd"
     print("Input args:" + str(args))
 
-    makeTrainedModel(args.categories, args.searchwords, args.keywordFilters, args.wrongwordFilters, args.taskName, args.scrapeOnRemote,
+    makeTrainedModel(args.taskName, args.categories, args.searchwords, args.keywordFilters, args.wrongwordFilters, args.scrapeOnRemote,
                      args.scrapingUserHost, args.remoteDir, int(args.numIterations))

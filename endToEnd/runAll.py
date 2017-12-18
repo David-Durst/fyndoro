@@ -33,3 +33,5 @@ if __name__ == "__main__":
     setupArgParserForRunAll(parser)
     makeTrainedModel.setupArgParserForMakingTrainedModel(parser)
     args = parser.parse_args()
+    runAll(args.taskName, args.categoryThreshold, args.categories, args.searchwords, args.keywordFilters, args.wrongwordFilters, args.scrapeOnRemote,
+                     args.scrapingUserHost, args.remoteDir, int(args.numIterations))
