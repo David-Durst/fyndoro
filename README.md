@@ -1,16 +1,13 @@
 * How To Install
 
 1. Install Conda - https://www.anaconda.com/download/
-2. Checkout this repository - git clone git@github.com:David-Durst/fyndoro.git
+2. Checkout this repository - git clone --recursive git@github.com:David-Durst/fyndoro.git
 3. Create the environment - conda env create -f environment.yml (or mac_env.yml if using a mac)
-3. Install gcloud terminal tools - https://cloud.google.com/sdk/downloads
-3. Get access to the Google Vision API - https://cloud.google.com/vision/docs/before-you-begin
-3. Provide gcloud access to the application - gcloud auth application-default login --no-launch-browser
-    a. documentation for command - https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login
-3. create a google API key and put in in the file API_KEY in the root of this project - https://support.google.com/cloud/answer/6158862?hl=en
-3. Install imagemagick - brew install imagemagick for mac
-3. Install gshuf (or shuf on linux) - brew install coreutils for mac
-4. Run the learner - python -m uncertain.learn
+3. Install imagemagick
+3. If you will be running scraping on a remote server, ensure that you have passwordless ssh login to that server from the server you will be running the main script on. and install this repository on that server. It is recommended that you install fyndoro in the root folder.
+3. Run the end-to-end process of initial model training, data collection for a specific task, transfer learning the model for that task, and testing with inference on instagram data. Do this by running endToEnd/runAll.py with the following command:
+
+python -m endToEnd.runAll --taskName testBags --categories handbag louisvuittonbag --searchwords "louis vuitton handbag" "handbag" --keywordFilters "louis vuitton" "handbag" --wrongwordFilters "coach fostello" "louis vuitton" --categoryThreshold 0.8
 
 How to run:
 You will either need to run the scraper on the same machine as the rest of the pipeline, or have passwordless login to the remote machine. For (almost) everywhere but Stanford, use public/private keys. For Stanford, run `kinit && aklog` to get a 24 hour kerberos ticket and repeat this every 24 hours you need the system to work.

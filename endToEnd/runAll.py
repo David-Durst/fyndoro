@@ -5,7 +5,7 @@ import argparse
 import os
 
 def runAll(taskName, categoryThreshold, categories, searchwords, keywordFilters, wrongwordFilters, scrapeOnRemote=False,
-           scrapingUserHost='durst@dawn4', remoteDir='fyndoro/', numIterations=2):
+           scrapingUserHost='durst@silk25', remoteDir='fyndoro/', numIterations=2):
     makeTrainedModel.makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwordFilters, scrapeOnRemote,
            scrapingUserHost, remoteDir, numIterations)
 

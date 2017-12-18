@@ -10,7 +10,7 @@ import sys
 
 #see below for documentation
 def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwordFilters, scrapeOnRemote=False,
-                     scrapingUserHost='durst@dawn4', remoteDir='fyndoro/', numIterations=2):
+                     scrapingUserHost='durst@silk25', remoteDir='fyndoro/', numIterations=2):
 
     def executeShellCommand(commandStr, returnResult=False):
         print("executing command: " + commandStr)
@@ -67,7 +67,7 @@ def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwor
             exit(1)
         else:
             executeShellCommand(
-                "ssh -q %s '%s %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd/modelsAndData/%s_data &> %s'" % (
+                "ssh %s 'source activate fyndoro ; %s %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd/modelsAndData/%s_data' &> %s" % (
                     scrapingUserHost, declareAllVars, remoteDir, remoteDir, taskName, imageLogPath))
             executeShellCommand("rsync --remove-source-files -a %s:%s/endToEnd/modelsAndData/%s_data/ %s" %
                                 (scrapingUserHost, remoteDir, taskName, imageFolderPath))
@@ -126,7 +126,7 @@ def setupArgParserForMakingTrainedModel(parser):
     optionalNamed = parser.add_argument_group('optional arguments for data downloading and model training')
     optionalNamed.add_argument('--scrapeOnRemote', default=False, action='store_true',
                                help='enable this to run the scraper on a different host from the rest of the system')
-    optionalNamed.add_argument('--scrapingUserHost', metavar="user@host", default='durst@dawn4',
+    optionalNamed.add_argument('--scrapingUserHost', metavar="user@host", default='durst@silk25',
                                help='the remote user@host to run the scraping on.')
     optionalNamed.add_argument('--remoteDir', metavar="remote/path/for/fyndoro", default='fyndoro/',
                                help='the fyndoro folder on the remote host for the scraping code and data.')
