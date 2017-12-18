@@ -34,7 +34,7 @@ def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwor
         executeShellCommand("bash make.sh")
     #import after sure installed
     #add path to SPN experiment folder so transferLearn can import its model
-    executeShellCommand("export PYTHONPATH=%s/SPN.pytorch/demo:$PYTHONPATH")
+    executeShellCommand("export PYTHONPATH=%s/SPN.pytorch/demo:$PYTHONPATH" % modulePath)
     import endToEnd.transferLearn as transferLearn
 
     # if model doesn't already exist, make it
