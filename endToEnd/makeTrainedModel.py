@@ -70,7 +70,7 @@ def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwor
                 "ssh -q %s '%s %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd/modelsAndData/%s_data &> %s'" % (
                     scrapingUserHost, declareAllVars, remoteDir, remoteDir, taskName, imageLogPath))
             executeShellCommand("rsync --remove-source-files -a %s:%s/endToEnd/modelsAndData/%s_data/ %s" %
-                                (scrapingUserHost, remoteDir, taskName, imageLogPath))
+                                (scrapingUserHost, remoteDir, taskName, imageFolderPath))
     else:
         executeShellCommand("%s %s/createTransferLearningDataSet.sh %s &> %s" % (
             declareAllVars, modulePath, imageFolderPath, imageLogPath))
