@@ -1,3 +1,4 @@
+#python -m endToEnd.runAll --taskName testBags --categories handbag louisvuittonbag --searchwords "louis vuitton handbag" "handbag" --keywordFilters "louis vuitton" "handbag" --wrongwordFilters "coach fostello" "louis vuitton" --categoryThreshold 0.8
 from subprocess import Popen, PIPE
 import argparse
 import os
@@ -11,12 +12,10 @@ import sys
 def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwordFilters, scrapeOnRemote=False,
                      scrapingUserHost='durst@dawn4', remoteDir='fyndoro/', numIterations=2):
 
-    shell = Popen(['/bin/bash'], stdin=PIPE, stdout=PIPE)
-
-    def executeShellCommand(commandStr, shell=shell, returnResult=False):
+    def executeShellCommand(commandStr, returnResult=False):
         print("executing command: " + commandStr)
-        shell.stdin.write(str.encode(commandStr + '\n'))
-        shell.stdin.flush()
+        shell = Popen(['/bin/bash', '-c', commandStr], stdin=PIPE, stdout=PIPE)
+        shell.wait()
         if returnResult:
             return shell.stdout.readline()
 
@@ -31,19 +30,16 @@ def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwor
 
     # install SPN.pytorch if its not already installed
     if importlib.util.find_spec("spn") is None:
-        executeShellCommand("cd %s/SPN.pytorch/spnlib" % modulePath)
-        executeShellCommand("bash make.sh")
+        executeShellCommand("cd %s/SPN.pytorch/spnlib ; bash make.sh" % modulePath)
     #import after sure installed
     #add path to SPN experiment folder so transferLearn can import its model
     sys.path.append("%s/SPN.pytorch/demo" % modulePath)
     import endToEnd.transferLearn as transferLearn
 
     # if model doesn't already exist, make it
-    executeShellCommand("cd %s/SPN.pytorch/demo" % modulePath)
     pathToModelPreTransferLearning = modulePath + "/SPN.pytorch/demo/logs/voc2007/model_best.pth.tar"
     if not os.path.isfile(pathToModelPreTransferLearning):
-        executeShellCommand("bash runme.sh")
-    executeShellCommand("cd %s" % modulePath)
+        executeShellCommand("cd %s/SPN.pytorch/demo ; bash runme.sh" % modulePath)
 
     # get strings for bash for getting data
     categoryGroupsBashStr = "categoryGroups=(%s)" % (convertListOfStringsToBashArray(categories, wrapString=""))
