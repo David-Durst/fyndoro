@@ -5,6 +5,7 @@ import importlib
 import time
 from endToEnd.filterImages import filterBasedOnEmbeddingSimilarity, getEmbeddingsForData
 from endToEnd.shared import *
+import sys
 
 #see below for documentation
 def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwordFilters, scrapeOnRemote=False,
@@ -34,7 +35,7 @@ def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwor
         executeShellCommand("bash make.sh")
     #import after sure installed
     #add path to SPN experiment folder so transferLearn can import its model
-    executeShellCommand("export PYTHONPATH=%s/SPN.pytorch/demo:$PYTHONPATH" % modulePath)
+    sys.path.append("%s/SPN.pytorch/demo" % modulePath)
     import endToEnd.transferLearn as transferLearn
 
     # if model doesn't already exist, make it
