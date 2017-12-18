@@ -8,29 +8,34 @@ dependencies:
 - cycler=0.10.0=py36_0
 - cython=0.26=py36_0
 - dbus=1.10.20=0
+- decorator=4.1.2=py36_0
 - expat=2.1.0=0
 - fontconfig=2.12.1=3
 - freetype=2.5.5=2
 - glib=2.50.2=1
 - gst-plugins-base=1.8.0=0
 - gstreamer=1.8.0=0
+- hdf5=1.8.17=2
 - icu=54.1=0
 - jbig=2.1=0
-- jpeg=9b=0
+- jpeg=8d=2
 - libffi=3.2.1=1
 - libgcc=5.2.0=0
+- libgfortran=3.0.0=1
 - libiconv=1.14=0
 - libpng=1.6.30=1
-- libtiff=4.0.6=3
+- libtiff=4.0.6=2
 - libxcb=1.12=1
 - libxml2=2.9.4=0
-- matplotlib=2.0.2=np113py36_0
+- matplotlib=2.0.2=np112py36_0
 - mkl=2017.0.3=0
-- numpy=1.13.1=py36_0
+- networkx=1.11=py36_0
+- numpy=1.12.1=py36_0
 - olefile=0.44=py36_0
 - openssl=1.0.2l=0
+- pandas=0.20.3=py36_0
 - pcre=8.39=1
-- pillow=4.2.1=py36_0
+- pillow=3.4.2=py36_0
 - pip=9.0.1=py36_1
 - pycparser=2.18=py36_0
 - pyparsing=2.2.0=py36_0
@@ -38,8 +43,12 @@ dependencies:
 - python=3.6.2=0
 - python-dateutil=2.6.1=py36_0
 - pytz=2017.2=py36_0
-- qt=5.6.2=5
+- pywavelets=0.5.2=np112py36_0
+- qt=5.6.2=2
 - readline=6.2=2
+- scikit-image=0.13.0=np112py36_0
+- scikit-learn=0.19.0=np112py36_0
+- scipy=0.19.1=np112py36_0
 - setuptools=36.4.0=py36_0
 - sip=4.18=py36_0
 - six=1.10.0=py36_0
@@ -65,17 +74,29 @@ dependencies:
   - grpcio==1.6.0
   - httplib2==0.10.3
   - idna==2.6
+  - instagram-scraper==1.5.17
+  - nibabel==2.2.0
   - oauth2client==4.1.2
+  - opencv-contrib-python==3.3.0.10
   - ply==3.8
   - protobuf==3.4.0
   - pyasn1==0.3.6
   - pyasn1-modules==0.1.4
+  - pyyaml==3.12
+  - pyzmq==16.0.3
   - requests==2.18.4
   - rsa==3.4.2
+  - selectivesearch==0.4
   - selenium==3.5.0
   - splinter==0.7.6
   - torch==0.2.0.post4
+  - torchfile==0.1.0
+  - torchnet==0.0.1
+  - torchsample==0.1.3
+  - tornado==4.5.2
+  - tqdm==4.19.4
   - uritemplate==3.0.0
   - urllib3==1.22
+  - visdom==0.1.6.3
 prefix: /lfs/1/durst/anaconda3/envs/fyndoro
 
