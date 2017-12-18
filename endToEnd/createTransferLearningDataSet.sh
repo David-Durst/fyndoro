@@ -2,8 +2,8 @@
 set -x
 # note, assume already have images in two folders with names from categoryGroups variable for the two classes
 # the absolute location of the folder containing those directories is the input
-scriptDir=$(dirname "$(readlink -f "$0")")
-images=$1
+scriptDir=$1
+images=$2
 createTrainVal=true
 createDatasets=true
 randomImages=~/fyndoro/randomImages
@@ -11,10 +11,10 @@ if [ -z ${categoryGroups+x} ]
 then
     echo "categoryGroups unset, using default values for all text search options"
     categoryGroups=("scarletTanager" "summerTanager")
-    declare -A searchwords=("scarlet tanager" "summer tanager")
-    declare -A keywordFilters=("scarlet" "summer")
+    declare searchwords=("scarlet tanager" "summer tanager")
+    declare keywordFilters=("scarlet" "summer")
     # wrongwords are words that indicate an image is bad
-    declare -A wrongwordFilters=("summer" "scarlet")
+    declare wrongwordFilters=("summer" "scarlet")
 fi
 numCategoryGroups=${#categoryGroups[@]}
 
@@ -49,7 +49,7 @@ if [ $createTrainVal == true ] ; then
         set +x
         shuf -n $(expr $valImages + $trainImages) -e $images/$c/* | xargs -I {} cp {} $images/train/$c/
         set -x
-        python $scriptDir/imageCleaningAndGoogleSearching/clean.py $images/train/$c
+        python $scriptDir/filterImages/filterNonImages.py $images/train/$c
         set +x
         shuf -n $valImages -e $images/train/$c/* | xargs -I {} mv {} $images/val/$c/
         set -x

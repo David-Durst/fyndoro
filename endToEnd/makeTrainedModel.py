@@ -67,7 +67,7 @@ def makeTrainedModel(taskName, categories, searchwords, keywordFilters, wrongwor
             exit(1)
         else:
             executeShellCommand(
-                "ssh %s 'source activate fyndoro ; %s %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd/modelsAndData/%s_data' &> %s" % (
+                "ssh %s 'source activate fyndoro ; %s source %s/endToEnd/createTransferLearningDataSet.sh %s/endToEnd %s/endToEnd/modelsAndData/%s_data' &> %s" % (
                     scrapingUserHost, declareAllVars, remoteDir, remoteDir, taskName, imageLogPath))
             executeShellCommand("rsync --remove-source-files -a %s:%s/endToEnd/modelsAndData/%s_data/ %s" %
                                 (scrapingUserHost, remoteDir, taskName, imageFolderPath))
